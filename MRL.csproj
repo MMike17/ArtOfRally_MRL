@@ -87,6 +87,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(GameLibPath)\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\artofrally\artofrally_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityModManager, Version=0.28.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(GameLibPath)\UnityModManager\UnityModManager.dll</HintPath>
@@ -96,6 +100,8 @@
     <Compile Include="EventResults.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches.cs" />
+    <Compile Include="RallyEventInfos.cs" />
+    <Compile Include="RallyEventsManager.cs" />
     <Compile Include="ResultsManager.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>

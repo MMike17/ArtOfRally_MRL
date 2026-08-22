@@ -6,6 +6,6 @@
 	"GameVersion": "1.5,5",
 	"AssemblyName": "MRL.dll",
 	"EntryMethod": "MRL.Main.Load",
-	"HomePage": "<modHomepageLink>",
+	"HomePage": "https://www.nexusmods.com/games/artofrally/mods/27",
 	"Repository": "https://raw.githubusercontent.com/MMike17/ArtOfRally_MRL/master/Repository.json"
 }

@@ -1,4 +1,6 @@
-﻿# Masters of Rally League
+﻿![](Screenshots/Cover.png)
+
+# Masters of Rally League
 
 [![](https://img.shields.io/github/v/release/MMike17/ArtOfRally_MRL?label=Download)](https://github.com/MMike17/ArtOfRally_MRL/releases/latest)
 ![](https://img.shields.io/badge/Game%20Version-v1.5.5-blue)
@@ -17,17 +19,23 @@ A mof to support the Masters of Rally League events.
 
 ## Usage
 
+Check the Masters of Rally League discord for the latest rally event in `#rally-events` channel.\
+Setup a custom rally with the right settings.
+
 Press Ctrl + F10 to open the mod manager menu.\
-Adjust settings to select [...] you want.\
-By default, the mod [...].
+Click the "Start run recording" button in the mod settings pannel and finish the custom rally.
 
-- **<settingName>** : will [...].
+![](Screenshots/Menu.png)
 
-Disabling the mod in the manager will [...] by default.
+The mod will open an explorer page by the time you finish the rally to the location of the result file.\
+You can post this file in `#event-submissions` on the Masters of Rally League discord server.
+
+Disabling the mod in the manager will do nothing by default.
 
 ## Disclaimer
 
-[...]
+You'll have to join the [Masters of Rally League discord server](https://discord.gg/U9bdFC7v5m) to partake in events.\
+This mod is under heavy development.
 
 ## Installation
 
@@ -38,8 +46,5 @@ and drop it into the mod manager's mods page.
 
 ## Showcase
 
-![](Screenshots/.png)
-
-## Acknowledgments
-
-[...]
+![](Screenshots/Menu.png)
+![](Screenshots/File.png)
