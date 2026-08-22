@@ -33,11 +33,11 @@ namespace MRL
             {
                 if (!ResultsManager.IsRecording)
                 {
-                    if (GUILayout.Button("Register run", GUILayout.Width(100)))
+                    if (GUILayout.Button("Start run recording", GUILayout.Width(400)))
                         ResultsManager.StartRecording();
-                    else
-                        GUILayout.Label("Already recording run");
                 }
+                else
+                    GUILayout.Label("Already recording run");
             }
             else
                 GUILayout.Label("Can't use this mod outside of the \"Custom Rally\" game mode");

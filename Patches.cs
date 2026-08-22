@@ -37,7 +37,7 @@ namespace MRL
                 Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
                 ResultsManager.WriteResults(player.GetResultsForCurrentRally());
 
-                Main.Log("Detected event result (" + player.GetResultsForCurrentRally().GetTotalRallyTime() + ")"m);
+                Main.Log("Detected event result (" + player.GetResultsForCurrentRally().GetTotalRallyTime() + ")");
             }
         }
 
