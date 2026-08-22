@@ -1,11 +1,11 @@
 {
-	"Id": "ModBase",
-	"DisplayName": "ModBase",
+	"Id": "MRL",
+	"DisplayName": "Masters of Rally League",
 	"Author": "MMike17",
 	"Version": "1.0.0",
 	"GameVersion": "1.5,5",
-	"AssemblyName": "ModBase.dll",
-	"EntryMethod": "ModBase.Main.Load",
+	"AssemblyName": "MRL.dll",
+	"EntryMethod": "MRL.Main.Load",
 	"HomePage": "<modHomepageLink>",
-	"Repository": "https://raw.githubusercontent.com/<github username>/<repo name>/<branch>/Repository.json"
+	"Repository": "https://raw.githubusercontent.com/MMike17/ArtOfRally_MRL/master/Repository.json"
 }

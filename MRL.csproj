@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
 	<!-- Change the name of the mod here -->
-    <RootNamespace>ModBase</RootNamespace>
+    <RootNamespace>MRL</RootNamespace>
     <AssemblyName>$(RootNamespace)</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

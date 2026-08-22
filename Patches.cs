@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace ModBase
+namespace MRL
 {
 	// Patch model
 	// [HarmonyPatch(typeof(), nameof())]
