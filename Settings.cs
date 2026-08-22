@@ -11,8 +11,6 @@ namespace MRL
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
-        public bool showMarkers;
-        [Draw(DrawType.Toggle)]
         //public bool disableInfoLogs = true;
         public bool disableInfoLogs = false;
 
@@ -20,8 +18,6 @@ namespace MRL
 
         public void OnChange()
         {
-            Main.SetMarkers(showMarkers);
-
             // SnapValue(, 0.1f);
         }
 
