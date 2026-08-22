@@ -7,7 +7,7 @@
     <ProjectGuid>{26DC118B-DB3A-4469-91C5-FCDDF5C152B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-	<!-- Change the name of the mod here -->
+    <!-- Change the name of the mod here -->
     <RootNamespace>MRL</RootNamespace>
     <AssemblyName>$(RootNamespace)</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -34,7 +34,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-  	<!-- Change this path to your local variant -->
+    <!-- Change this path to your local variant -->
     <GamePath>C:\Program Files (x86)\Steam\steamapps\common\artofrally</GamePath>
     <GameLibPath>$([System.IO.Path]::Combine($(GamePath), artofrally_Data\Managed))</GameLibPath>
     <GameModPath>$([System.IO.Path]::Combine($(GamePath), Mods\$(AssemblyName)))</GameModPath>
@@ -91,17 +91,18 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="Patches.cs" />
+    <Compile Include="ResultsManager.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PrepareBuild" AfterTargets="BeforeBuild">
-	<CallTarget Targets="CleanFolder" />
-	<CallTarget Targets="CopyInfo" />
+    <CallTarget Targets="CleanFolder" />
+    <CallTarget Targets="CopyInfo" />
   </Target>
   <Target Name="Deploy" AfterTargets="CoreBuild">
-	<CallTarget Targets="CopyDLL" />
-	<!-- Use this line to copy asset bundles from "/Assets" to the mod folder -->
-	<!-- <CallTarget Targets="CopyAssets" /> -->
+    <CallTarget Targets="CopyDLL" />
+    <!-- Use this line to copy asset bundles from "/Assets" to the mod folder -->
+    <!-- <CallTarget Targets="CopyAssets" /> -->
   </Target>
   <Target Name="CleanFolder">
     <RemoveDir Directories="$(GameModPath)" />
@@ -113,10 +114,10 @@
     <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(GameModPath)" />
   </Target>
   <Target Name="CopyAssets">
-	<ItemGroup>
-		<SourceFiles Include="Assets\*.*" />
-	</ItemGroup>
-	<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(GameModPath)"/>
+    <ItemGroup>
+      <SourceFiles Include="Assets\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(GameModPath)" />
   </Target>
   <Target Name="StartGame" AfterTargets="AfterBuild">
     <Exec Command="&quot;$([System.IO.Path]::Combine($(GamePath), artofrally.exe))&quot;" />

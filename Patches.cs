@@ -32,12 +32,12 @@ namespace MRL
     {
         static void Prefix()
         {
-            if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
+            if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && ResultsManager.IsRecording)
             {
-                Main.Log("Detected end of rally !!!"); // This pings when we go to the end screen
+                Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
+                ResultsManager.WriteResults(player.GetResultsForCurrentRally());
 
-                Main.Log("Current time : " +
-                TimeFormatter.GetCachedFormattedTimeLong(GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer).GetResultsForCurrentRally().GetTotalRallyTime()));
+                Main.Log("Detected event result (" + player.GetResultsForCurrentRally().GetTotalRallyTime() + ")"m);
             }
         }
 
