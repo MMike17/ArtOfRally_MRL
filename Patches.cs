@@ -1,7 +1,5 @@
 using HarmonyLib;
 
-// TODO : Start detection
-
 namespace MRL
 {
     // Patch model
@@ -36,22 +34,7 @@ namespace MRL
             {
                 Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
                 ResultsManager.WriteResults(player.GetResultsForCurrentRally());
-
-                Main.Log("Detected event result (" + player.GetResultsForCurrentRally().GetTotalRallyTime() + ")");
             }
-        }
-
-        //this will negate the method
-
-        //static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        //{
-        //    foreach (var instruction in instructions)
-        //        yield return new CodeInstruction(OpCodes.Ret);
-        //}
-
-        static void Postfix()
-        {
-            //
         }
     }
 }
