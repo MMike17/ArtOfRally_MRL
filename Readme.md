@@ -5,7 +5,7 @@
 [![](https://img.shields.io/github/v/release/MMike17/ArtOfRally_MRL?label=Download)](https://github.com/MMike17/ArtOfRally_MRL/releases/latest)
 ![](https://img.shields.io/badge/Game%20Version-v1.5.5-blue)
 
-A mof to support the Masters of Rally League events.
+A mod to support the Masters of Rally League events.
 
 #### Launcher Support
 
