@@ -19,16 +19,17 @@ A mod to support the Masters of Rally League events.
 
 ## Usage
 
-Check the Masters of Rally League discord for the latest rally event in `#rally-events` channel.\
-Setup a custom rally with the right settings.
-
-Press Ctrl + F10 to open the mod manager menu.\
-Click the "Start run recording" button in the mod settings pannel and finish the custom rally.
+Simply select the `masters of rally league` button in the `online events` menu.\
+The mod will setup the current MRL event and start it after you select your car.
 
 ![](Screenshots/Menu.png)
 
+You can get the details and lore on the current event from the Masters of Rally League discord in the `#rally-events` channel.
+
 The mod will open an explorer page by the time you finish the rally to the location of the result file.\
 You can post this file in `#event-submissions` on the Masters of Rally League discord server.
+
+![](Screenshots/File.png)
 
 Disabling the mod in the manager will do nothing by default.
 

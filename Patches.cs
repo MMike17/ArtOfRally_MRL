@@ -27,6 +27,8 @@ namespace MRL
     // 	}
     // }
 
+    // TODO : Remove the menu option on toggle ?
+
     [HarmonyPatch(typeof(RallyData), nameof(RallyData.SetRallyComplete))]
     static class CompletionDetector
     {
