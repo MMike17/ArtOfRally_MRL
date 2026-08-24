@@ -13,20 +13,19 @@ namespace MRL
         const int ENCRYPTION_KEY = 573; // TODO : This will get changed with rolling encryption
 
         public static bool IsRecording { get; private set; }
+        public static EventInfos rallyInfo { get; private set; }
 
         public static void GetEventInfos()
         {
-            return; // TEST
-
             UnityWebRequest request = UnityWebRequest.Get(INFO_FILE_URL);
             AsyncOperation op = request.SendWebRequest();
             op.completed += asyncOp =>
             {
                 if (request.isHttpError || request.isNetworkError)
-                    Main.Error(request.error);
+                    Main.Error("Couldn't retrieve rally info from server\n" + request.error);
                 else
                 {
-                    EventInfos rallyInfo = JsonUtility.FromJson<EventInfos>(request.downloadHandler.text);
+                    rallyInfo = JsonUtility.FromJson<EventInfos>(request.downloadHandler.text);
                     Main.Log("Received rally info");
                 }
             };
@@ -35,7 +34,6 @@ namespace MRL
         public static void StartRecording()
         {
             IsRecording = true;
-            Main.Log("Starting recording");
         }
 
         public static void WriteResults(DriverRallyResults playerResults)

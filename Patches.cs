@@ -1,7 +1,6 @@
 using HarmonyLib;
-
-// TODO : Add new custom button on the main page
-// TODO : Setup event from web sourced data
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace MRL
 {
@@ -40,6 +39,52 @@ namespace MRL
                     Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
                     EventsManager.WriteResults(player.GetResultsForCurrentRally());
                 }
+            });
+        }
+    }
+
+    [HarmonyPatch(typeof(PanelManager), nameof(PanelManager.Start))]
+    static class CustomButtonBuilder
+    {
+        static void Postfix(PanelManager __instance)
+        {
+            Main.Try(nameof(CustomButtonBuilder), () =>
+            {
+                Transform panelRoot = __instance.OnlineEventsSelect.transform;
+                CustomButton[] buttons = panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>();
+                CustomButton newButton = GameObject.Instantiate(buttons[buttons.Length - 1], panelRoot.transform.GetChild(0));
+                newButton.name = "Masters of rally league (Button)";
+
+                Navigation nav = buttons[0].navigation;
+                nav.selectOnUp = newButton;
+                buttons[0].navigation = nav;
+
+                nav = buttons[buttons.Length - 1].navigation;
+                nav.selectOnDown = newButton;
+                buttons[buttons.Length - 1].navigation = nav;
+
+                nav = newButton.navigation;
+                nav.selectOnUp = buttons[buttons.Length - 1]; // on down is already correct
+                newButton.navigation = nav;
+
+                newButton.onClick = new Button.ButtonClickedEvent();
+
+                newButton.onClick.AddListener(() =>
+                {
+                    Main.Try("Custom rally setup", () =>
+                    {
+                        // TODO : Future cool screen to show infos would be here instead of pop season directly
+                        __instance.AddPanelAddToHistory(__instance.CarChooserPanel);
+                        // TODO : Select car class here ?
+                        GameObject.FindObjectOfType<CarChooserHelper>().InitDisplayClass();
+
+                        GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
+                        GameModeManager.RallyManager.SeasonData = EventsManager.rallyInfo.GenerateSeason();
+                        EventsManager.StartRecording();
+                    });
+                });
+
+                newButton.GetComponentInChildren<Text>().text = "masters of rally league";
             });
         }
     }
