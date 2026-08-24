@@ -8,7 +8,7 @@ namespace MRL
 {
     /// <summary>Holds informations about rally events that are sent through a Gist</summary>
     [Serializable]
-    public class RallyEventInfos
+    public class EventInfos
     {
         public int year;
         public CarClass carClass;

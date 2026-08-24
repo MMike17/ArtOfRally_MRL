@@ -1,19 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MRL
 {
     [Serializable]
-    class EventResults
+    public class EventResults
     {
-        public List<string> results;
+        public string carName;
+        public List<StageResult> results;
         public string final;
 
         public EventResults(DriverRallyResults source)
         {
-            results = new List<string>(source.StageTimes.Count);
-            source.StageTimes.ForEach(item => results.Add(TimeFormatter.GetCachedFormattedTimeLong(item)));
+            Season season = GameModeManager.GetSeasonDataCurrentGameMode();
+            carName = season.SelectedCar.name;
+            results = new List<StageResult>();
+
+            for (int i = 0; i < season.Rallies[0].StageCount; i++)
+            {
+                Stage stage = season.Rallies[0].StageList[i];
+                results.Add(new StageResult(
+                    stage.Name,
+                    stage.Weather.ToString(),
+                    TimeFormatter.GetCachedFormattedTimeLong(source.StageTimes[i]))
+                );
+            }
+
             final = TimeFormatter.GetCachedFormattedTimeLong(source.GetTotalRallyTime());
+        }
+
+        public string ToJson()
+        {
+            string json = JsonUtility.ToJson(this, true);
+            int insertIndex = json.IndexOf(',') + 2;
+            string stageResultsJson = "\"" + nameof(results) + "\": [\n";
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                stageResultsJson += JsonUtility.ToJson(results[i], true);
+
+                if (i < results.Count - 1)
+                    stageResultsJson += ",\n";
+            }
+
+            stageResultsJson += "\n],\n";
+            json = json.Insert(insertIndex, stageResultsJson);
+            return json;
+        }
+
+        [Serializable]
+        public class StageResult
+        {
+            public string stageName;
+            public string stageWeather;
+            public string time;
+
+            public StageResult(string stageName, string stageWeather, string time)
+            {
+                this.stageName = stageName;
+                this.stageWeather = stageWeather;
+                this.time = time;
+            }
         }
     }
 }

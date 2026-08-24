@@ -37,7 +37,7 @@ namespace MRL
             };
             modEntry.OnSaveGUI = settings.Save;
 
-            RallyEventsManager.Init();
+            EventsManager.GetEventInfos();
             return true;
         }
 

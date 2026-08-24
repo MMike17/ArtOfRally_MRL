@@ -1,5 +1,8 @@
 using HarmonyLib;
 
+// TODO : Add new custom button on the main page
+// TODO : Setup event from web sourced data
+
 namespace MRL
 {
     // Patch model
@@ -30,11 +33,14 @@ namespace MRL
     {
         static void Prefix()
         {
-            if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && ResultsManager.IsRecording)
+            Main.Try("CompletionDetector", () =>
             {
-                Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
-                ResultsManager.WriteResults(player.GetResultsForCurrentRally());
-            }
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && EventsManager.IsRecording)
+                {
+                    Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
+                    EventsManager.WriteResults(player.GetResultsForCurrentRally());
+                }
+            });
         }
     }
 }

@@ -27,10 +27,10 @@ namespace MRL
 
             if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
             {
-                if (!ResultsManager.IsRecording)
+                if (!EventsManager.IsRecording)
                 {
                     if (GUILayout.Button("Start run recording", GUILayout.Width(400)))
-                        ResultsManager.StartRecording();
+                        EventsManager.StartRecording();
                 }
                 else
                     GUILayout.Label("Already recording run");
