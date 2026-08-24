@@ -2,7 +2,7 @@
 	"Id": "MRL",
 	"DisplayName": "Masters of Rally League",
 	"Author": "MMike17",
-	"Version": "1.0.0",
+	"Version": "1.1.0",
 	"GameVersion": "1.5,5",
 	"AssemblyName": "MRL.dll",
 	"EntryMethod": "MRL.Main.Load",

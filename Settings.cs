@@ -11,8 +11,8 @@ namespace MRL
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
-        //public bool disableInfoLogs = true;
-        public bool disableInfoLogs = false;
+        public bool disableInfoLogs = true;
+        //public bool disableInfoLogs = false;
 
         public override void Save(ModEntry modEntry) => Save(this, modEntry);
 
