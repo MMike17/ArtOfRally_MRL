@@ -52,6 +52,10 @@ namespace MRL
         {
             Main.Try(nameof(CustomButtonBuilder), () =>
             {
+                // error message is already logged on fetching
+                if (EventsManager.rallyInfo == null)
+                    return;
+
                 Transform panelRoot = __instance.OnlineEventsSelect.transform;
                 CustomButton[] buttons = panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>();
                 CustomButton newButton = GameObject.Instantiate(buttons[buttons.Length - 1], panelRoot.transform.GetChild(0));
