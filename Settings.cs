@@ -9,6 +9,9 @@ namespace MRL
     {
         // [Draw(DrawType.)]
 
+        [Draw(DrawType.Auto)]
+        public bool openFolderOnResults = true;
+
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
         public bool disableInfoLogs = true;

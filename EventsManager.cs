@@ -46,7 +46,14 @@ namespace MRL
             File.WriteAllText(filePath, EncryptResults(new EventResults(playerResults)));
             Main.Log("Saved rally results to " + filePath);
 
-            Process.Start("explorer.exe", "\"" + Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\"");
+            if (Main.settings.openFolderOnResults)
+            {
+                Process.Start(
+                    "explorer.exe",
+                    "\"" + Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\""
+                );
+            }
+
             IsRecording = false;
         }
 
