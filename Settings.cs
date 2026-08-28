@@ -27,19 +27,6 @@ namespace MRL
         internal void OnGUI()
         {
             // custom GUI here
-
-            if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
-            {
-                if (!EventsManager.IsRecording)
-                {
-                    if (GUILayout.Button("Start run recording", GUILayout.Width(400)))
-                        EventsManager.StartRecording();
-                }
-                else
-                    GUILayout.Label("Already recording run");
-            }
-            else
-                GUILayout.Label("Can't use this mod outside of the \"Custom Rally\" game mode");
         }
 
         private float SnapValue(float value, float snapValue, float range, float snapPercent)
