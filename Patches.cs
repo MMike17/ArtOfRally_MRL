@@ -1,3 +1,4 @@
+using System.Configuration;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -91,6 +92,19 @@ namespace MRL
                 });
 
                 newButton.GetComponentInChildren<Text>().text = "masters of rally league";
+            });
+        }
+    }
+
+    [HarmonyPatch(typeof(PauseScreen), "OnEnable")]
+    static class RestartsRemover
+    {
+        static void Postfix(PauseScreen __instance)
+        {
+            Main.Try(nameof(RestartsRemover), () =>
+            {
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && EventsManager.IsRecording)
+                    ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
             });
         }
     }
