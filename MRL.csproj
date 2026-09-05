@@ -100,8 +100,8 @@
     <Compile Include="EventResults.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches.cs" />
-    <Compile Include="EventInfos.cs" />
     <Compile Include="EventsManager.cs" />
+    <Compile Include="ServerInfo.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,3 @@
-using System.Configuration;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,7 +53,7 @@ namespace MRL
             Main.Try(nameof(CustomButtonBuilder), () =>
             {
                 // error message is already logged on fetching
-                if (EventsManager.rallyInfo == null)
+                if (EventsManager.serverInfos == null)
                     return;
 
                 Transform panelRoot = __instance.OnlineEventsSelect.transform;
@@ -86,7 +85,7 @@ namespace MRL
                         GameObject.FindObjectOfType<CarChooserHelper>().InitDisplayClass();
 
                         GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
-                        GameModeManager.RallyManager.SeasonData = EventsManager.rallyInfo.GenerateSeason();
+                        GameModeManager.RallyManager.SeasonData = EventsManager.serverInfos.GenerateSeason();
                         EventsManager.StartRecording();
                     });
                 });

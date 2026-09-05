@@ -13,7 +13,7 @@ namespace MRL
         const int ENCRYPTION_KEY = 573; // TODO : This will get changed with rolling encryption
 
         public static bool IsRecording { get; private set; }
-        public static EventInfos rallyInfo { get; private set; }
+        public static ServerInfo serverInfos { get; private set; }
 
         public static void GetEventInfos()
         {
@@ -25,7 +25,7 @@ namespace MRL
                     Main.Error("Couldn't retrieve rally info from server\n" + request.error);
                 else
                 {
-                    rallyInfo = JsonUtility.FromJson<EventInfos>(request.downloadHandler.text);
+                    serverInfos = JsonUtility.FromJson<ServerInfo>(request.downloadHandler.text);
                     Main.Log("Received rally info");
                 }
             };
