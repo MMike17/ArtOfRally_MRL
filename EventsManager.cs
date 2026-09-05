@@ -8,6 +8,9 @@ namespace MRL
 {
     class EventsManager
     {
+        static readonly string SEASON_TAG = "  \"currentSeason\": ";
+        static readonly string RALLY_TAG = "  \"currentRally\": ";
+
         const string INFO_FILE_URL = "https://gist.githubusercontent.com/MMike17/7b9ed3de87db0969d05877ac14f50fd5/raw/RallyEvent.txt";
         const string RESULTS_FILE_NAME = "RallyResults.mrl";
         const int ENCRYPTION_KEY = 573; // TODO : This will get changed with rolling encryption
@@ -25,8 +28,16 @@ namespace MRL
                     Main.Error("Couldn't retrieve rally info from server\n" + request.error);
                 else
                 {
-                    serverInfos = JsonUtility.FromJson<ServerInfo>(request.downloadHandler.text);
-                    Main.Log("Received rally info");
+                    string seasonJson = request.downloadHandler.text
+                        .Split(new[] { SEASON_TAG }, StringSplitOptions.None)[1]
+                        .Split('}')[0] + '}';
+
+                    string rallyJson = request.downloadHandler.text
+                        .Split(new[] { RALLY_TAG }, StringSplitOptions.None)[1]
+                        .Split('}')[0] + '}';
+
+                    serverInfos = new ServerInfo(seasonJson, rallyJson);
+                    Main.Log("Received server info");
                 }
             };
         }

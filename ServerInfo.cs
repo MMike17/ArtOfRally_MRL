@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using static AreaManager;
 using static Car;
 using static ConditionTypes;
@@ -11,6 +12,12 @@ namespace MRL
     {
         public SeasonInfo currentSeason;
         public RallyInfo currentRally;
+
+        public ServerInfo(string seasonJson, string rallyJson)
+        {
+            currentSeason = JsonUtility.FromJson<SeasonInfo>(seasonJson);
+            currentRally = JsonUtility.FromJson<RallyInfo>(rallyJson);
+        }
 
         public Season GenerateSeason()
         {
