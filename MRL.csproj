@@ -97,10 +97,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventResults.cs" />
+    <Compile Include="RallyResults.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches.cs" />
-    <Compile Include="EventsManager.cs" />
+    <Compile Include="CustomEventManager.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>

@@ -36,10 +36,10 @@ namespace MRL
         {
             Main.Try("CompletionDetector", () =>
             {
-                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && EventsManager.IsRecording)
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && CustomEventManager.IsRecording)
                 {
                     Driver player = GameModeManager.GetSeasonDataCurrentGameMode().DriverList.Find(item => item.isPlayer);
-                    EventsManager.WriteResults(player.GetResultsForCurrentRally());
+                    CustomEventManager.WriteResults(player.GetResultsForCurrentRally());
                 }
             });
         }
@@ -53,7 +53,7 @@ namespace MRL
             Main.Try(nameof(CustomButtonBuilder), () =>
             {
                 // error message is already logged on fetching
-                if (EventsManager.serverInfos == null)
+                if (CustomEventManager.serverInfos == null)
                     return;
 
                 Transform panelRoot = __instance.OnlineEventsSelect.transform;
@@ -85,8 +85,8 @@ namespace MRL
                         GameObject.FindObjectOfType<CarChooserHelper>().InitDisplayClass();
 
                         GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
-                        GameModeManager.RallyManager.SeasonData = EventsManager.serverInfos.GenerateSeason();
-                        EventsManager.StartRecording();
+                        GameModeManager.RallyManager.SeasonData = CustomEventManager.serverInfos.GenerateSeason();
+                        CustomEventManager.StartRecording();
                     });
                 });
 
@@ -102,10 +102,13 @@ namespace MRL
         {
             Main.Try(nameof(PauseRestartsRemover), () =>
             {
-                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM &&
-                    EventsManager.IsRecording &&
-                    !Main.settings.trainingMode)
-                    ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && CustomEventManager.IsRecording)
+                {
+                    if (Main.settings.trainingMode)
+                        CustomEventManager.MarkTraining();
+                    else
+                        ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
+                }
             });
         }
     }
@@ -117,10 +120,13 @@ namespace MRL
         {
             Main.Try(nameof(EndRestartRemover), () =>
             {
-                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM &&
-                    EventsManager.IsRecording &&
-                    !Main.settings.trainingMode)
-                    ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && CustomEventManager.IsRecording)
+                {
+                    if (Main.settings.trainingMode)
+                        CustomEventManager.MarkTraining();
+                    else
+                        ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
+                }
             });
         }
     }

@@ -5,16 +5,18 @@ using UnityEngine;
 namespace MRL
 {
     [Serializable]
-    public class EventResults
+    public class RallyResults
     {
         public string carName;
+        public string carClass;
         public List<StageResult> results;
         public string final;
 
-        public EventResults(DriverRallyResults source)
+        public RallyResults(DriverRallyResults source)
         {
             Season season = GameModeManager.GetSeasonDataCurrentGameMode();
             carName = season.SelectedCar.name;
+            carClass = season.SelectedCar.carClass.ToString();
             results = new List<StageResult>();
 
             for (int i = 0; i < season.Rallies[0].StageCount; i++)

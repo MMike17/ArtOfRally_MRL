@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 namespace MRL
 {
-    class EventsManager
+    class CustomEventManager
     {
         static readonly string SEASON_TAG = "  \"currentSeason\": ";
         static readonly string RALLY_TAG = "  \"currentRally\": ";
@@ -17,6 +17,8 @@ namespace MRL
 
         public static bool IsRecording { get; private set; }
         public static ServerInfo serverInfos { get; private set; }
+
+        private static bool inTraining;
 
         public static void GetEventInfos()
         {
@@ -42,19 +44,30 @@ namespace MRL
             };
         }
 
-        public static void StartRecording()
+        public static void StartRecording() => IsRecording = true;
+
+        public static void MarkTraining()
         {
-            IsRecording = true;
+            if (!inTraining)
+                Main.Log("Detected in training");
+
+            inTraining = true;
         }
 
         public static void WriteResults(DriverRallyResults playerResults)
         {
+            if (inTraining)
+            {
+                Main.Log("Training mode was detected at some point in the rally");
+                return;
+            }
+
             string filePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                 RESULTS_FILE_NAME
             );
 
-            File.WriteAllText(filePath, EncryptResults(new EventResults(playerResults)));
+            File.WriteAllText(filePath, EncryptResults(new RallyResults(playerResults)));
             Main.Log("Saved rally results to " + filePath);
 
             if (Main.settings.openFolderOnResults)
@@ -68,7 +81,7 @@ namespace MRL
             IsRecording = false;
         }
 
-        private static string EncryptResults(EventResults results)
+        private static string EncryptResults(RallyResults results)
         {
             string jsonData = results.ToJson();
             string result = string.Empty;
