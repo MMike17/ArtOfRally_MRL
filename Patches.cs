@@ -96,13 +96,30 @@ namespace MRL
     }
 
     [HarmonyPatch(typeof(PauseScreen), "OnEnable")]
-    static class RestartsRemover
+    static class PauseRestartsRemover
     {
         static void Postfix(PauseScreen __instance)
         {
-            Main.Try(nameof(RestartsRemover), () =>
+            Main.Try(nameof(PauseRestartsRemover), () =>
             {
-                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM && EventsManager.IsRecording)
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM &&
+                    EventsManager.IsRecording &&
+                    !Main.settings.trainingMode)
+                    ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
+            });
+        }
+    }
+
+    [HarmonyPatch(typeof(PostStageScreen), nameof(PostStageScreen.ForceUpdateOfUI))]
+    static class EndRestartRemover
+    {
+        static void Postfix(PostStageScreen __instance)
+        {
+            Main.Try(nameof(EndRestartRemover), () =>
+            {
+                if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM &&
+                    EventsManager.IsRecording &&
+                    !Main.settings.trainingMode)
                     ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
             });
         }
