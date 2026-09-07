@@ -10,6 +10,8 @@ namespace MRL
         // [Draw(DrawType.)]
 
         [Draw(DrawType.Auto)]
+        public bool trainingMode = false;
+        [Draw(DrawType.Auto)]
         public bool openFolderOnResults = true;
 
         [Header("Debug")]
