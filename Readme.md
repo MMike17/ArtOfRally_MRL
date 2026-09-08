@@ -31,6 +31,14 @@ You can post this file in `#event-submissions` on the Masters of Rally League di
 
 ![](Screenshots/File.png)
 
+Press Ctrl + F10 to open the mod manager menu.
+
+### Options
+
+- **trainingMode** : training mode will enable the restarts and disable results generation. You can enable training mode during the rally.
+- **openFolderOnResults** : will open the folder in which the results will be written at the end of the rally.
+
+
 Disabling the mod in the manager will do nothing by default.
 
 ## Disclaimer
@@ -49,3 +57,4 @@ and drop it into the mod manager's mods page.
 
 ![](Screenshots/Menu.png)
 ![](Screenshots/File.png)
+![](Screenshots/Settings.png)
