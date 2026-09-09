@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
+using static Car;
 
 namespace MRL
 {
@@ -104,12 +105,17 @@ namespace MRL
                     ServerInfo info = CustomEventManager.serverInfos;
                     GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
                     GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
-                    CarManager.SetChosenClass(isSeason ? info.currentSeason.group : info.currentRally.openClassGroup);
+                    CarClass group = isSeason ? info.currentSeason.group : info.currentRally.openClassGroup;
+                    CarManager.SetChosenClass(group);
                     SaveGame.Save();
 
                     // TODO : Future cool screen to show infos would be here instead of pop season directly
-                    GameObject.FindObjectOfType<CarChooserHelper>().InitHideClass();
+                    CarChooserHelper chooser = GameObject.FindObjectOfType<CarChooserHelper>();
+                    chooser.GroupTitle.carClass = group;
+                    chooser.InitHideClass();
+
                     instance.AddPanelAddToHistory(instance.CarChooserPanel);
+                    chooser.GroupTitle.ConstructString(group);
                     CustomEventManager.StartRecording();
                 });
             });
