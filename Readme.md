@@ -27,7 +27,7 @@ The mod will setup the current MRL event and start it after you select your car.
 You can get the details and lore on the current event from the Masters of Rally League discord in the `#rally-events` channel.
 
 The mod will open an explorer page by the time you finish the rally to the location of the result file.\
-You can post this file in `#event-submissions` on the Masters of Rally League discord server.
+You can post this file in `#submissions` on the Masters of Rally League discord server.
 
 ![](Screenshots/File.png)
 
@@ -37,7 +37,6 @@ Press Ctrl + F10 to open the mod manager menu.
 
 - **trainingMode** : training mode will enable the restarts and disable results generation. You can enable training mode during the rally.
 - **openFolderOnResults** : will open the folder in which the results will be written at the end of the rally.
-
 
 Disabling the mod in the manager will do nothing by default.
 
