@@ -89,6 +89,8 @@ namespace MRL
                 });
 
                 newButton.GetComponentInChildren<Text>().text = "masters of rally league";
+
+                // TODO : Convert to "MRL" + "season" or "open class" options
             });
         }
     }

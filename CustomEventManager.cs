@@ -44,7 +44,11 @@ namespace MRL
             };
         }
 
-        public static void StartRecording() => IsRecording = true;
+        public static void StartRecording()
+        {
+            IsRecording = true;
+            inTraining = Main.settings.trainingMode;
+        }
 
         public static void MarkTraining()
         {
