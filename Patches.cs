@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,48 +51,71 @@ namespace MRL
         {
             Main.Try(nameof(CustomButtonBuilder), () =>
             {
-                // error message is already logged on fetching
                 if (CustomEventManager.serverInfos == null)
                     return;
 
                 Transform panelRoot = __instance.OnlineEventsSelect.transform;
-                CustomButton[] buttons = panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>();
-                CustomButton newButton = GameObject.Instantiate(buttons[buttons.Length - 1], panelRoot.transform.GetChild(0));
-                newButton.name = "Masters of rally league (Button)";
+                List<CustomButton> buttons = new List<CustomButton>(
+                    panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>());
 
-                Navigation nav = buttons[0].navigation;
-                nav.selectOnUp = newButton;
-                buttons[0].navigation = nav;
+                buttons.Add(SpawnNewButton(
+                    buttons[buttons.Count - 1],
+                    panelRoot.transform.GetChild(0),
+                    "MRL season",
+                    __instance,
+                    true
+                ));
 
-                nav = buttons[buttons.Length - 1].navigation;
-                nav.selectOnDown = newButton;
-                buttons[buttons.Length - 1].navigation = nav;
+                buttons.Add(SpawnNewButton(
+                    buttons[buttons.Count - 1],
+                    panelRoot.transform.GetChild(0),
+                    "MRL open class",
+                    __instance,
+                    false
+                ));
 
-                nav = newButton.navigation;
-                nav.selectOnUp = buttons[buttons.Length - 1]; // on down is already correct
-                newButton.navigation = nav;
-
-                newButton.onClick = new Button.ButtonClickedEvent();
-
-                newButton.onClick.AddListener(() =>
+                for (int i = 0; i < buttons.Count; i++)
                 {
-                    Main.Try("Custom rally setup", () =>
-                    {
-                        // TODO : Future cool screen to show infos would be here instead of pop season directly
-                        __instance.AddPanelAddToHistory(__instance.CarChooserPanel);
-                        // TODO : Select car class here ?
-                        GameObject.FindObjectOfType<CarChooserHelper>().InitDisplayClass();
-
-                        GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
-                        GameModeManager.RallyManager.SeasonData = CustomEventManager.serverInfos.GenerateSeason();
-                        CustomEventManager.StartRecording();
-                    });
-                });
-
-                newButton.GetComponentInChildren<Text>().text = "masters of rally league";
-
-                // TODO : Convert to "MRL" + "season" or "open class" options
+                    Navigation currentNav = buttons[i].navigation;
+                    currentNav.selectOnUp = buttons[i == 0 ? buttons.Count - 1 : i - 1];
+                    currentNav.selectOnDown = buttons[i == buttons.Count - 1 ? 0 : i + 1];
+                    buttons[i].navigation = currentNav;
+                }
             });
+        }
+
+        private static CustomButton SpawnNewButton(
+            CustomButton model,
+            Transform parent,
+            string buttonText,
+            PanelManager instance,
+            bool isSeason
+        )
+        {
+            CustomButton newButton = GameObject.Instantiate(model, parent);
+            newButton.name = $"{buttonText} (Button)";
+
+            newButton.onClick = new Button.ButtonClickedEvent();
+
+            newButton.onClick.AddListener(() =>
+            {
+                Main.Try("Custom rally setup", () =>
+                {
+                    ServerInfo info = CustomEventManager.serverInfos;
+                    GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
+                    GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
+                    CarManager.SetChosenClass(isSeason ? info.currentSeason.group : info.currentRally.openClassGroup);
+                    SaveGame.Save();
+
+                    // TODO : Future cool screen to show infos would be here instead of pop season directly
+                    GameObject.FindObjectOfType<CarChooserHelper>().InitHideClass();
+                    instance.AddPanelAddToHistory(instance.CarChooserPanel);
+                    CustomEventManager.StartRecording();
+                });
+            });
+
+            newButton.GetComponentInChildren<Text>().text = buttonText;
+            return newButton;
         }
     }
 
