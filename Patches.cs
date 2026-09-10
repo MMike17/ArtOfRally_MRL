@@ -103,8 +103,8 @@ namespace MRL
                 Main.Try("Custom rally setup", () =>
                 {
                     ServerInfo info = CustomEventManager.serverInfos;
-                    GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
                     GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
+                    GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
                     CarClass group = isSeason ? info.currentSeason.group : info.currentRally.openClassGroup;
                     CarManager.SetChosenClass(group);
                     SaveGame.Save();
