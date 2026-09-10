@@ -33,12 +33,17 @@ namespace MRL
             titleText.font = boldFont;
             StyleText style = titleText.gameObject.AddComponent<StyleText>();
             Main.SetField(style, STYLE_PROP_NAME, BindingFlags.Instance, TextType.StageTitle);
-            titleText.fontSize = StyleConstants.Text.StageTitle.GetFontSize(uiScale);
+            titleText.fontSize = Mathf.RoundToInt(Mathf.Lerp(
+                StyleConstants.Text.StageTitle.GetFontSize(uiScale),
+                StyleConstants.Text.Header1.GetFontSize(uiScale),
+                0.5f
+            ));
 
             stagesText.font = standardFont;
             style = stagesText.gameObject.AddComponent<StyleText>();
             Main.SetField(style, STYLE_PROP_NAME, BindingFlags.Instance, TextType.Header1);
             stagesText.fontSize = StyleConstants.Text.Header1.GetFontSize(uiScale);
+            stagesText.lineSpacing = 1.5f;
 
             deadlineText.font = boldFont;
             style = deadlineText.gameObject.AddComponent<StyleText>();
