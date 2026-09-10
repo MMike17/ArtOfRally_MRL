@@ -56,41 +56,29 @@ namespace MRL
             {
                 Main.Try("Setup MRL rally", () =>
                 {
-                    Main.Log("1");
                     // TODO : Test the order of this to make sure it works
                     ServerInfo info = CustomEventManager.serverInfos;
-                    Main.Log("2");
                     GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
-                    Main.Log("3");
                     GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
-                    Main.Log("4");
 
                     CarClass group = isSeason ? info.currentSeason.group : info.currentRally.openClassGroup;
-                    Main.Log("5");
                     CarManager.SetChosenClass(group);
-                    Main.Log("6");
                     SaveGame.Save();
-                    Main.Log("7");
 
                     CarChooserHelper chooser = GameObject.FindObjectOfType<CarChooserHelper>();
-                    Main.Log("8");
                     ServerInfo infos = CustomEventManager.serverInfos;
-                    Main.Log("9");
                     chooser.GroupTitle.carClass = group;
-                    Main.Log("10");
                     chooser.InitHideClass();
-                    Main.Log("11");
                     chooser.GroupTitle.ConstructString(group, (isSeason ? "Season" : "Open class") + " rally");
-                    Main.Log("12");
+
                     PopCarChoicePanel?.Invoke();
-                    Main.Log("13");
                 });
             });
 
             FirstSelected = mainButton.gameObject;
             OnPanelPushedEvent = new UnityEngine.Events.UnityEvent();
 
-            // TODO : How do I come back when we press B ?
+            // TODO : Fix when I press B to come back
         }
 
         public void ShowInfos(bool isSeason)
@@ -109,6 +97,7 @@ namespace MRL
 
             List<Stage> stageList = areaDictionary[infos.currentRally.location].stageList;
             string stages = "Stages :";
+            // TODO : Is there a way to add more spacing between the stage names ?
 
             for (int i = 0; i < infos.currentRally.stageIndeces.Length; i++)
             {
@@ -118,7 +107,6 @@ namespace MRL
 
             stagesText.text = stages;
             string suffix = string.Empty;
-            // TODO : Is there a way to add more spacing between the stage names ?
 
             if (infos.currentRally.deadline.Contains("st"))
                 suffix = "st";

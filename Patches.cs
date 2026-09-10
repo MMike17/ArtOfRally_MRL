@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static Car;
 
 namespace MRL
 {
@@ -54,7 +54,7 @@ namespace MRL
         {
             Main.Try(nameof(MRLScreenBuilder), () =>
             {
-                if (CustomEventManager.serverInfos == null)
+                if (CustomEventManager.serverInfos == null || SceneManager.GetActiveScene().buildIndex != 3)
                     return;
 
                 Font boldFont = __instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
@@ -109,11 +109,6 @@ namespace MRL
             {
                 Main.Try("Show MRL panel", () =>
                 {
-                    // TODO : Future cool screen to show infos would be here instead of pop season directly
-                    // How do I hide the current screen without disabling it totally ?
-                    // How do I go back from that without going to main menu ?
-                    // Do I create a new pannel ?
-
                     panel.ShowInfos(isSeason);
                     instance.AddPanelAddToHistory(panel);
                 });
