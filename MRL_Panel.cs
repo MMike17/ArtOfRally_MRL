@@ -21,7 +21,7 @@ namespace MRL
         private Text descriptionText;
         private bool isSeason;
 
-        public void Setup(Font boldFont, Font standardFont)
+        public void Setup(Font boldFont, Font standardFont, Action PopCarChoicePanel)
         {
             titleText = transform.GetChild(0).GetChild(2).GetComponent<Text>();
             stagesText = transform.GetChild(1).GetComponent<Text>();
@@ -82,6 +82,8 @@ namespace MRL
                     Main.Log("11");
                     chooser.GroupTitle.ConstructString(group, (isSeason ? "Season" : "Open class") + " rally");
                     Main.Log("12");
+                    PopCarChoicePanel?.Invoke();
+                    Main.Log("13");
                 });
             });
 
@@ -116,6 +118,7 @@ namespace MRL
 
             stagesText.text = stages;
             string suffix = string.Empty;
+            // TODO : Is there a way to add more spacing between the stage names ?
 
             if (infos.currentRally.deadline.Contains("st"))
                 suffix = "st";

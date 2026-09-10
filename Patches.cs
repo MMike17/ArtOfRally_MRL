@@ -61,7 +61,7 @@ namespace MRL
                 Font standardFont = __instance.GetComponentInChildren<VersionText>().GetComponent<Text>().font;
 
                 panel = Main.SpawnMRL_Panel(__instance.transform);
-                panel.Setup(boldFont, standardFont);
+                panel.Setup(boldFont, standardFont, () => __instance.AddPanelAddToHistory(__instance.CarChooserPanel));
 
                 Transform panelRoot = __instance.OnlineEventsSelect.transform;
                 List<CustomButton> buttons = new List<CustomButton>(
