@@ -46,14 +46,22 @@ namespace MRL
     }
 
     [HarmonyPatch(typeof(PanelManager), nameof(PanelManager.Start))]
-    static class CustomButtonBuilder
+    static class MRLScreenBuilder
     {
+        private static MRL_Panel panel;
+
         static void Postfix(PanelManager __instance)
         {
-            Main.Try(nameof(CustomButtonBuilder), () =>
+            Main.Try(nameof(MRLScreenBuilder), () =>
             {
                 if (CustomEventManager.serverInfos == null)
                     return;
+
+                Font boldFont = __instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
+                Font standardFont = __instance.GetComponentInChildren<VersionText>().GetComponent<Text>().font;
+
+                panel = Main.SpawnMRL_Panel(__instance.transform);
+                panel.Setup(boldFont, standardFont);
 
                 Transform panelRoot = __instance.OnlineEventsSelect.transform;
                 List<CustomButton> buttons = new List<CustomButton>(
@@ -97,26 +105,17 @@ namespace MRL
             newButton.name = $"{buttonText} (Button)";
 
             newButton.onClick = new Button.ButtonClickedEvent();
-
             newButton.onClick.AddListener(() =>
             {
-                Main.Try("Custom rally setup", () =>
+                Main.Try("Show MRL panel", () =>
                 {
-                    ServerInfo info = CustomEventManager.serverInfos;
-                    GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
-                    GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
-                    CarClass group = isSeason ? info.currentSeason.group : info.currentRally.openClassGroup;
-                    CarManager.SetChosenClass(group);
-                    SaveGame.Save();
-
                     // TODO : Future cool screen to show infos would be here instead of pop season directly
-                    CarChooserHelper chooser = GameObject.FindObjectOfType<CarChooserHelper>();
-                    chooser.GroupTitle.carClass = group;
-                    chooser.InitHideClass();
+                    // How do I hide the current screen without disabling it totally ?
+                    // How do I go back from that without going to main menu ?
+                    // Do I create a new pannel ?
 
-                    instance.AddPanelAddToHistory(instance.CarChooserPanel);
-                    chooser.GroupTitle.ConstructString(group);
-                    CustomEventManager.StartRecording();
+                    panel.ShowInfos(isSeason);
+                    instance.AddPanelAddToHistory(panel);
                 });
             });
 
