@@ -20,7 +20,7 @@ namespace MRL
 
         private static bool inTraining;
 
-        public static void GetEventInfos()
+        public static void GetServerInfos()
         {
             UnityWebRequest request = UnityWebRequest.Get(INFO_FILE_URL);
             AsyncOperation op = request.SendWebRequest();

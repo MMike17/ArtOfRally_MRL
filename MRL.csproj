@@ -63,6 +63,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(GameLibPath)\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\artofrally\artofrally_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(GameLibPath)\UnityEngine.CoreModule.dll</HintPath>
@@ -97,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MRL_Panel.cs" />
     <Compile Include="RallyResults.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches.cs" />
@@ -112,7 +117,7 @@
   <Target Name="Deploy" AfterTargets="CoreBuild">
     <CallTarget Targets="CopyDLL" />
     <!-- Use this line to copy asset bundles from "/Assets" to the mod folder -->
-    <!-- <CallTarget Targets="CopyAssets" /> -->
+    <CallTarget Targets="CopyAssets" />
   </Target>
   <Target Name="CleanFolder">
     <RemoveDir Directories="$(GameModPath)" />

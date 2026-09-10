@@ -1,6 +1,8 @@
 using HarmonyLib;
 using System;
+using System.IO;
 using System.Reflection;
+using UnityEngine;
 using UnityModManagerNet;
 
 using static UnityModManagerNet.UnityModManager;
@@ -9,6 +11,7 @@ namespace MRL
 {
     public class Main
     {
+        const string BUNDLE_NAME = "masters_of_rally_league";
         public static bool enabled { get; private set; }
 
         /// <summary>This is provided by UnityModManager to log messages to the console</summary>
@@ -17,6 +20,8 @@ namespace MRL
         public static Settings settings;
         /// <summary>This will be called when the mod is toggles on/off</summary>
         public static event Action<bool> OnToggle;
+
+        private static GameObject MRL_UI_Prefab;
 
         // Called by the mod manager
         static bool Load(ModEntry modEntry)
@@ -37,7 +42,20 @@ namespace MRL
             };
             modEntry.OnSaveGUI = settings.Save;
 
-            CustomEventManager.GetEventInfos();
+            Try("Load Bundle", () =>
+            {
+                AssetBundle bundle = AssetBundle.LoadFromFile(Path.Combine(modEntry.Path, BUNDLE_NAME));
+
+                if (bundle != null)
+                    MRL_UI_Prefab = bundle.LoadAsset<GameObject>("MRL_Display");
+                else
+                    Error("Couldn't load asset bundle \"" + BUNDLE_NAME + "\"");
+
+                if (bundle != null)
+                    Log("Loaded bundle \"" + BUNDLE_NAME + "\"");
+            });
+
+            Try("Retrieve server infos", () => CustomEventManager.GetServerInfos());
             return true;
         }
 
@@ -128,6 +146,11 @@ namespace MRL
             }
 
             return (U)info.Invoke(source, args);
+        }
+
+        public static MRL_Panel SpawnMRL_Panel(Transform parent)
+        {
+            return GameObject.Instantiate(MRL_UI_Prefab, parent).AddComponent<MRL_Panel>();
         }
     }
 }
