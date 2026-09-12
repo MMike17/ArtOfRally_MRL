@@ -93,7 +93,8 @@ namespace MRL
             ServerInfo infos = CustomEventManager.serverInfos;
 
             // TODO : Here we should get the flag from the game's leaderboard system
-            titleText.text = $"{infos.currentRally.name}\n{infos.currentRally.country} - {infos.currentSeason.year}";
+            titleText.text = $"{infos.currentRally.name}\n" +
+                $"{infos.currentRally.country} - {infos.currentSeason.year} - {(isSeason ? "Season" : "Open class")} rally";
 
             Dictionary<Areas, Area> areaDictionary = Main.GetField<Dictionary<Areas, Area>, AreaManager>(
                 null,
