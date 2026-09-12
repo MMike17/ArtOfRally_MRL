@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static AreaManager;
 using static Car;
@@ -61,7 +62,6 @@ namespace MRL
             {
                 Main.Try("Setup MRL rally", () =>
                 {
-                    // TODO : Test the order of this to make sure it works
                     ServerInfo info = CustomEventManager.serverInfos;
                     GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
                     GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
@@ -81,9 +81,10 @@ namespace MRL
             });
 
             FirstSelected = mainButton.gameObject;
-            OnPanelPushedEvent = new UnityEngine.Events.UnityEvent();
 
-            // TODO : Fix when I press B to come back
+            OnPanelPushedEvent = new UnityEngine.Events.UnityEvent();
+            OnPanelPushedEvent.AddListener(() => EventSystem.current.SetSelectedGameObject(mainButton.gameObject));
+            OnPanelPoppedEvent = new UnityEngine.Events.UnityEvent();
         }
 
         public void ShowInfos(bool isSeason)
@@ -97,12 +98,11 @@ namespace MRL
             Dictionary<Areas, Area> areaDictionary = Main.GetField<Dictionary<Areas, Area>, AreaManager>(
                 null,
                 "areaDictionary",
-                System.Reflection.BindingFlags.Static
+                BindingFlags.Static
             );
 
             List<Stage> stageList = areaDictionary[infos.currentRally.location].stageList;
             string stages = "Stages :";
-            // TODO : Is there a way to add more spacing between the stage names ?
 
             for (int i = 0; i < infos.currentRally.stageIndeces.Length; i++)
             {

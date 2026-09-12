@@ -110,7 +110,7 @@ namespace MRL
                 Main.Try("Show MRL panel", () =>
                 {
                     panel.ShowInfos(isSeason);
-                    instance.AddPanelAddToHistory(panel);
+                    instance.AddPanelAddToHistory(panel, true);
                 });
             });
 
