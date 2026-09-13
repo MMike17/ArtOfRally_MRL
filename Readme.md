@@ -57,3 +57,7 @@ and drop it into the mod manager's mods page.
 ![](Screenshots/Menu.png)
 ![](Screenshots/File.png)
 ![](Screenshots/Settings.png)
+
+## Acknowledgments
+
+ISO-3166-1 country codes provided by the package Bia.Countries

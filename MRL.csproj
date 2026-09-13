@@ -40,6 +40,9 @@
     <GameModPath>$([System.IO.Path]::Combine($(GamePath), Mods\$(AssemblyName)))</GameModPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bia.Countries, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Bia.Countries.3.0.0\lib\net461\Bia.Countries.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -70,6 +73,10 @@
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(GameLibPath)\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\artofrally\artofrally_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -113,6 +120,9 @@
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PrepareBuild" AfterTargets="BeforeBuild">
     <CallTarget Targets="CleanFolder" />
@@ -131,6 +141,7 @@
   </Target>
   <Target Name="CopyDll">
     <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(GameModPath)" />
+    <Copy SourceFiles="$(OutputPath)\Bia.Countries.dll" DestinationFolder="$(GameModPath)" />
   </Target>
   <Target Name="CopyAssets">
     <ItemGroup>
