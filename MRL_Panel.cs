@@ -20,6 +20,7 @@ namespace MRL
         private Text stagesText;
         private Text deadlineText;
         private Text descriptionText;
+        private DateTime deadline;
         private bool isSeason;
 
         public void Setup(Font boldFont, Font standardFont, Action PopCarChoicePanel)
@@ -85,6 +86,15 @@ namespace MRL
             OnPanelPushedEvent = new UnityEngine.Events.UnityEvent();
             OnPanelPushedEvent.AddListener(() => EventSystem.current.SetSelectedGameObject(mainButton.gameObject));
             OnPanelPoppedEvent = new UnityEngine.Events.UnityEvent();
+
+            InvokeRepeating("UpdateDeadline", 1, 1);
+        }
+
+        private void UpdateDeadline()
+        {
+            TimeSpan delay = deadline.ToLocalTime() - DateTime.Now;
+            string delayText = $"{(delay.Days > 0 ? delay.Days + " days " : "")}{delay.Hours}:{delay.Minutes}:{delay.Seconds}";
+            deadlineText.text = $"{deadline.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")}\n{delayText}";
         }
 
         public void ShowInfos(bool isSeason)
@@ -112,24 +122,9 @@ namespace MRL
             }
 
             stagesText.text = stages;
-            string suffix = string.Empty;
 
-            if (infos.currentRally.deadline.Contains("st"))
-                suffix = "st";
-
-            if (infos.currentRally.deadline.Contains("nd"))
-                suffix = "nd";
-
-            if (infos.currentRally.deadline.Contains("rd"))
-                suffix = "rd";
-
-            if (infos.currentRally.deadline.Contains("th"))
-                suffix = "th";
-
-            deadlineText.text = TimeZoneInfo.ConvertTimeToUtc(
-                DateTime.Parse(infos.currentRally.deadline.Replace(suffix, "")).AddHours(12),
-                TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")
-            ).ToLocalTime().ToString("dd MMMM yyyy, HH:mm").Insert(2, suffix);
+            if (deadline == default)
+                deadline = DateTimeOffset.FromUnixTimeSeconds(infos.currentRally.deadline).DateTime;
 
             descriptionText.text = infos.currentRally.description;
             CustomEventManager.StartRecording();

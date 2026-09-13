@@ -54,7 +54,8 @@ namespace MRL
         {
             Main.Try(nameof(MRLScreenBuilder), () =>
             {
-                if (CustomEventManager.serverInfos == null || SceneManager.GetActiveScene().buildIndex != 3)
+                // TODO : Should I make it wait to make sure it can be done ? (probably / coroutine on PanelManager ?)
+                if (CustomEventManager.serverInfos == null || SceneManager.GetActiveScene().buildIndex != 3 || panel != null)
                     return;
 
                 Font boldFont = __instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
