@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
@@ -48,49 +50,55 @@ namespace MRL
     [HarmonyPatch(typeof(PanelManager), nameof(PanelManager.Start))]
     static class MRLScreenBuilder
     {
+        private const int REQUEST_DELAY = 3;
+        private const int REQUEST_TRIES = 5;
         private static MRL_Panel panel;
 
         static void Postfix(PanelManager __instance)
         {
             Main.Try(nameof(MRLScreenBuilder), () =>
             {
-                // TODO : Should I make it wait to make sure it can be done ? (probably / coroutine on PanelManager ?)
-                if (CustomEventManager.serverInfos == null || SceneManager.GetActiveScene().buildIndex != 3 || panel != null)
+                if (SceneManager.GetActiveScene().buildIndex != 3 || panel != null)
                     return;
 
-                Font boldFont = __instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
-                Font standardFont = __instance.GetComponentInChildren<VersionText>().GetComponent<Text>().font;
+                Main.Log(nameof(PanelManager.Start));
 
-                panel = Main.SpawnMRL_Panel(__instance.transform);
-                panel.Setup(boldFont, standardFont, () => __instance.AddPanelAddToHistory(__instance.CarChooserPanel));
-
-                Transform panelRoot = __instance.OnlineEventsSelect.transform;
-                List<CustomButton> buttons = new List<CustomButton>(
-                    panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>());
-
-                buttons.Add(SpawnNewButton(
-                    buttons[buttons.Count - 1],
-                    panelRoot.transform.GetChild(0),
-                    "MRL season",
-                    __instance,
-                    true
-                ));
-
-                buttons.Add(SpawnNewButton(
-                    buttons[buttons.Count - 1],
-                    panelRoot.transform.GetChild(0),
-                    "MRL open class",
-                    __instance,
-                    false
-                ));
-
-                for (int i = 0; i < buttons.Count; i++)
+                __instance.StartCoroutine(WaitForInfos(__instance, instance =>
                 {
-                    Navigation currentNav = buttons[i].navigation;
-                    currentNav.selectOnUp = buttons[i == 0 ? buttons.Count - 1 : i - 1];
-                    currentNav.selectOnDown = buttons[i == buttons.Count - 1 ? 0 : i + 1];
-                    buttons[i].navigation = currentNav;
-                }
+                    Font boldFont = __instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
+                    Font standardFont = __instance.GetComponentInChildren<VersionText>().GetComponent<Text>().font;
+
+                    panel = Main.SpawnMRL_Panel(__instance.transform);
+                    panel.Setup(boldFont, standardFont, () => __instance.AddPanelAddToHistory(__instance.CarChooserPanel));
+
+                    Transform panelRoot = __instance.OnlineEventsSelect.transform;
+                    List<CustomButton> buttons = new List<CustomButton>(
+                        panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>());
+
+                    buttons.Add(SpawnNewButton(
+                        buttons[buttons.Count - 1],
+                        panelRoot.transform.GetChild(0),
+                        "MRL season",
+                        __instance,
+                        true
+                    ));
+
+                    buttons.Add(SpawnNewButton(
+                        buttons[buttons.Count - 1],
+                        panelRoot.transform.GetChild(0),
+                        "MRL open class",
+                        __instance,
+                        false
+                    ));
+
+                    for (int i = 0; i < buttons.Count; i++)
+                    {
+                        Navigation currentNav = buttons[i].navigation;
+                        currentNav.selectOnUp = buttons[i == 0 ? buttons.Count - 1 : i - 1];
+                        currentNav.selectOnDown = buttons[i == buttons.Count - 1 ? 0 : i + 1];
+                        buttons[i].navigation = currentNav;
+                    }
+                }));
             });
         }
 
@@ -117,6 +125,25 @@ namespace MRL
 
             newButton.GetComponentInChildren<Text>().text = buttonText;
             return newButton;
+        }
+
+        private static IEnumerator WaitForInfos(PanelManager instance, Action<PanelManager> OnReceivedInfo)
+        {
+            int tries = 0;
+
+            while (tries < REQUEST_TRIES)
+            {
+                CustomEventManager.GetServerInfos();
+                yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
+
+                if (CustomEventManager.serverInfos != null)
+                    break;
+
+                tries++;
+            }
+
+            if (CustomEventManager.serverInfos != null)
+                OnReceivedInfo?.Invoke(instance);
         }
     }
 
