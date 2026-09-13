@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Bia.Countries.Iso3166;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,8 +17,10 @@ namespace MRL
         private const string STYLE_PROP_NAME = "_scaleType";
 
         private Button mainButton;
+        private Image flagImage;
         private Text titleText;
         private Text stagesText;
+        private Image panelImage;
         private Text deadlineText;
         private Text descriptionText;
         private DateTime deadline;
@@ -25,8 +28,10 @@ namespace MRL
 
         public void Setup(Font boldFont, Font standardFont, Action PopCarChoicePanel)
         {
-            titleText = transform.GetChild(0).GetChild(2).GetComponent<Text>();
+            flagImage = transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>();
+            titleText = transform.GetChild(0).GetChild(1).GetComponent<Text>();
             stagesText = transform.GetChild(1).GetComponent<Text>();
+            panelImage = transform.GetChild(2).GetChild(0).GetComponent<Image>();
             deadlineText = transform.GetChild(3).GetComponent<Text>();
             descriptionText = transform.GetChild(4).GetComponent<Text>();
 
@@ -86,11 +91,9 @@ namespace MRL
             OnPanelPushedEvent = new UnityEngine.Events.UnityEvent();
             OnPanelPushedEvent.AddListener(() => EventSystem.current.SetSelectedGameObject(mainButton.gameObject));
             OnPanelPoppedEvent = new UnityEngine.Events.UnityEvent();
-
-            InvokeRepeating("UpdateDeadline", 1, 1);
         }
 
-        private void UpdateDeadline()
+        private void Update()
         {
             TimeSpan delay = deadline.ToLocalTime() - DateTime.Now;
             string delayText = $"{(delay.Days > 0 ? delay.Days + " days " : "")}{delay.Hours}:{delay.Minutes}:{delay.Seconds}";
@@ -102,7 +105,9 @@ namespace MRL
             this.isSeason = isSeason;
             ServerInfo infos = CustomEventManager.serverInfos;
 
-            // TODO : Here we should get the flag from the game's leaderboard system
+            Country country = Countries.GetCountryByPartialFullName(infos.currentRally.country)[0];
+            flagImage.sprite = Resources.Load<Sprite>($"Sprites/CountryFlags/{country.Alpha2}");
+
             titleText.text = $"{infos.currentRally.name}\n" +
                 $"{infos.currentRally.country} - {infos.currentSeason.year} - {(isSeason ? "Season" : "Open class")} rally";
 
@@ -122,6 +127,7 @@ namespace MRL
             }
 
             stagesText.text = stages;
+            panelImage.sprite = infos.currentRally.panel;
 
             if (deadline == default)
                 deadline = DateTimeOffset.FromUnixTimeSeconds(infos.currentRally.deadline).DateTime;

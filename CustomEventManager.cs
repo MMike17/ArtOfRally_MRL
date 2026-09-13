@@ -26,21 +26,35 @@ namespace MRL
             AsyncOperation op = request.SendWebRequest();
             op.completed += asyncOp =>
             {
-                if (request.isHttpError || request.isNetworkError)
-                    Main.Error("Couldn't retrieve rally info from server\n" + request.error);
-                else
+                Main.Try("On received server infos", () =>
                 {
-                    string seasonJson = request.downloadHandler.text
-                        .Split(new[] { SEASON_TAG }, StringSplitOptions.None)[1]
-                        .Split('}')[0] + '}';
+                    if (request.isHttpError || request.isNetworkError)
+                        Main.Error("Couldn't retrieve rally info from server\n" + request.error);
+                    else
+                    {
+                        string seasonJson = request.downloadHandler.text
+                            .Split(new[] { SEASON_TAG }, StringSplitOptions.None)[1]
+                            .Split('}')[0] + '}';
 
-                    string rallyJson = request.downloadHandler.text
-                        .Split(new[] { RALLY_TAG }, StringSplitOptions.None)[1]
-                        .Split('}')[0] + '}';
+                        string rallyJson = request.downloadHandler.text
+                            .Split(new[] { RALLY_TAG }, StringSplitOptions.None)[1]
+                            .Split('}')[0] + '}';
 
-                    serverInfos = new ServerInfo(seasonJson, rallyJson);
-                    Main.Log("Received server info");
-                }
+                        serverInfos = new ServerInfo(seasonJson, rallyJson);
+
+                        byte[] data = Convert.FromBase64String(serverInfos.currentRally.rallyPanel.Split(',')[1]);
+                        Texture2D texture = new Texture2D(0, 0);
+                        texture.LoadImage(data);
+
+                        serverInfos.currentRally.panel = Sprite.Create(
+                            texture,
+                            new Rect(0, 0, texture.width, texture.height),
+                            Vector2.one / 2
+                        );
+
+                        Main.Log("Received server info");
+                    }
+                });
             };
         }
 
