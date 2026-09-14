@@ -50,45 +50,43 @@ namespace MRL
     [HarmonyPatch(typeof(PanelManager), nameof(PanelManager.Start))]
     static class MRLScreenBuilder
     {
-        private const int REQUEST_DELAY = 3;
-        private const int REQUEST_TRIES = 5;
         private static MRL_Panel panel;
+        private static CustomButton waitingButton;
 
         static void Postfix(PanelManager __instance)
         {
-            Main.Try(nameof(MRLScreenBuilder), () =>
+            if (SceneManager.GetActiveScene().buildIndex != 3 || panel != null)
+                return;
+
+            __instance.StartCoroutine(WaitForInfos(__instance, instance =>
             {
-                if (SceneManager.GetActiveScene().buildIndex != 3 || panel != null)
-                    return;
-
-                Main.Log(nameof(PanelManager.Start));
-
-                __instance.StartCoroutine(WaitForInfos(__instance, instance =>
+                Main.Try(nameof(MRLScreenBuilder), () =>
                 {
-                    Font boldFont = __instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
-                    Font standardFont = __instance.GetComponentInChildren<VersionText>().GetComponent<Text>().font;
+                    Font boldFont = instance.MainPanel.transform.GetChild(0).GetChild(0).GetComponentInChildren<Text>().font;
+                    Font standardFont = instance.GetComponentInChildren<VersionText>().GetComponent<Text>().font;
 
-                    panel = Main.SpawnMRL_Panel(__instance.transform);
-                    panel.Setup(boldFont, standardFont, () => __instance.AddPanelAddToHistory(__instance.CarChooserPanel));
+                    panel = Main.SpawnMRL_Panel(instance.transform);
+                    panel.Setup(boldFont, standardFont, () => instance.AddPanelAddToHistory(instance.CarChooserPanel));
 
-                    Transform panelRoot = __instance.OnlineEventsSelect.transform;
-                    List<CustomButton> buttons = new List<CustomButton>(
-                        panelRoot.transform.GetChild(0).GetComponentsInChildren<CustomButton>());
+                    Transform parent = instance.OnlineEventsSelect.transform.GetChild(0);
+                    List<CustomButton> buttons = new List<CustomButton>(parent.GetComponentsInChildren<CustomButton>());
 
                     buttons.Add(SpawnNewButton(
-                        buttons[buttons.Count - 1],
-                        panelRoot.transform.GetChild(0),
+                        buttons[0],
+                        parent,
                         "MRL season",
-                        __instance,
-                        true
+                        instance,
+                        true,
+                        () => ShowMRLPanel(panel, instance, true)
                     ));
 
                     buttons.Add(SpawnNewButton(
-                        buttons[buttons.Count - 1],
-                        panelRoot.transform.GetChild(0),
+                        buttons[0],
+                        parent,
                         "MRL open class",
-                        __instance,
-                        false
+                        instance,
+                        false,
+                        () => ShowMRLPanel(panel, instance, false)
                     ));
 
                     for (int i = 0; i < buttons.Count; i++)
@@ -98,8 +96,10 @@ namespace MRL
                         currentNav.selectOnDown = buttons[i == buttons.Count - 1 ? 0 : i + 1];
                         buttons[i].navigation = currentNav;
                     }
-                }));
-            });
+
+                    Main.Log(nameof(MRLScreenBuilder) + " : Setup buttons");
+                });
+            }));
         }
 
         private static CustomButton SpawnNewButton(
@@ -107,43 +107,63 @@ namespace MRL
             Transform parent,
             string buttonText,
             PanelManager instance,
-            bool isSeason
+            bool isSeason,
+            Action OnClicked
         )
         {
             CustomButton newButton = GameObject.Instantiate(model, parent);
             newButton.name = $"{buttonText} (Button)";
+            newButton.GetComponentInChildren<Text>().text = buttonText;
 
             newButton.onClick = new Button.ButtonClickedEvent();
-            newButton.onClick.AddListener(() =>
-            {
-                Main.Try("Show MRL panel", () =>
-                {
-                    panel.ShowInfos(isSeason);
-                    instance.AddPanelAddToHistory(panel, true);
-                });
-            });
+            newButton.onClick.AddListener(() => OnClicked?.Invoke());
 
-            newButton.GetComponentInChildren<Text>().text = buttonText;
             return newButton;
+        }
+
+        private static void ShowMRLPanel(MRL_Panel panel, PanelManager instance, bool isSeason)
+        {
+            Main.Try("Show MRL panel", () =>
+            {
+                panel.ShowInfos(isSeason);
+                instance.AddPanelAddToHistory(panel, true);
+            });
         }
 
         private static IEnumerator WaitForInfos(PanelManager instance, Action<PanelManager> OnReceivedInfo)
         {
-            int tries = 0;
-
-            while (tries < REQUEST_TRIES)
+            if (CustomEventManager.serverInfos == null && !CustomEventManager.failedFetching)
             {
-                CustomEventManager.GetServerInfos();
-                yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
+                Transform parent = instance.OnlineEventsSelect.transform.GetChild(0);
+                waitingButton = SpawnNewButton(
+                    parent.GetChild(parent.childCount - 1).GetComponent<CustomButton>(),
+                    parent,
+                    "<i>waiting for server infos...</i>",
+                    instance,
+                    false,
+                    null
+                );
 
-                if (CustomEventManager.serverInfos != null)
-                    break;
+                Navigation nav = waitingButton.navigation;
+                nav.selectOnUp = null;
+                nav.selectOnDown = null;
+                nav.selectOnRight = null;
+                nav.selectOnLeft = null;
+                waitingButton.navigation = nav;
 
-                tries++;
+                waitingButton.interactable = false;
+                Main.Log(nameof(MRLScreenBuilder) + " : Waiting for server infos");
+
+                yield return new WaitUntil(() => CustomEventManager.serverInfos != null || CustomEventManager.failedFetching);
             }
 
-            if (CustomEventManager.serverInfos != null)
+            if (CustomEventManager.failedFetching)
+                waitingButton.GetComponentInChildren<Text>().text = "<i>couldn't retrieve server info</i>";
+            else
+            {
+                GameObject.DestroyImmediate(waitingButton.gameObject);
                 OnReceivedInfo?.Invoke(instance);
+            }
         }
     }
 

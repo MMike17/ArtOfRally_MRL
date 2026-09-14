@@ -55,7 +55,7 @@ namespace MRL
                     Log("Loaded bundle \"" + BUNDLE_NAME + "\"");
             });
 
-            Try("Retrieve server infos", () => CustomEventManager.GetServerInfos());
+            CustomEventManager.FetchServerInfo();
             return true;
         }
 

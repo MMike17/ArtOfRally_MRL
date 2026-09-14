@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
@@ -8,20 +9,47 @@ namespace MRL
 {
     class CustomEventManager
     {
-        static readonly string SEASON_TAG = "  \"currentSeason\": ";
-        static readonly string RALLY_TAG = "  \"currentRally\": ";
+        private const string SEASON_TAG = "  \"currentSeason\": ";
+        private const string RALLY_TAG = "  \"currentRally\": ";
+        private const int REQUEST_DELAY = 3;
+        private const int REQUEST_TRIES = 6;
 
         const string INFO_FILE_URL = "https://gist.githubusercontent.com/MMike17/7b9ed3de87db0969d05877ac14f50fd5/raw/RallyEvent.txt";
         const string RESULTS_FILE_NAME = "RallyResults.mrl";
         const int ENCRYPTION_KEY = 573; // TODO : This will get changed with rolling encryption
 
         public static bool IsRecording { get; private set; }
+        public static bool failedFetching { get; private set; }
         public static ServerInfo serverInfos { get; private set; }
 
         private static bool inTraining;
 
-        public static void GetServerInfos()
+        public static void FetchServerInfo() => GameModeManager.instance.StartCoroutine(FetchInfosLoop());
+
+        private static IEnumerator FetchInfosLoop()
         {
+            serverInfos = null;
+            failedFetching = false;
+            int tries = 0;
+
+            while (tries < REQUEST_TRIES)
+            {
+                SendInfosRequest();
+                yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
+
+                if (serverInfos != null)
+                    yield break;
+
+                tries++;
+            }
+
+            failedFetching = true;
+        }
+
+        private static void SendInfosRequest()
+        {
+            Main.Log("Sending server request...");
+
             UnityWebRequest request = UnityWebRequest.Get(INFO_FILE_URL);
             AsyncOperation op = request.SendWebRequest();
             op.completed += asyncOp =>
