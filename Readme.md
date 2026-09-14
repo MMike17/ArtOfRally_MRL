@@ -19,12 +19,12 @@ A mod to support the Masters of Rally League events.
 
 ## Usage
 
-Simply select the `masters of rally league` button in the `online events` menu.\
-The mod will setup the current MRL event and start it after you select your car.
+Select the `MRL season` or `MRL open class` button in the `online events` menu.\
+The mod will display the information relative to the current MRL rally and start it after you select your car.
 
 ![](Screenshots/Menu.png)
 
-You can get the details and lore on the current event from the Masters of Rally League discord in the `#rally-events` channel.
+You can also get details and lore on the current event from the Masters of Rally League discord in the `#rally-events` channel.
 
 The mod will open an explorer page by the time you finish the rally to the location of the result file.\
 You can post this file in `#submissions` on the Masters of Rally League discord server.
