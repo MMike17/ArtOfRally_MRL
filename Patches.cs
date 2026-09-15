@@ -161,7 +161,9 @@ namespace MRL
                 waitingButton.GetComponentInChildren<Text>().text = "<i>couldn't retrieve server info</i>";
             else
             {
-                GameObject.DestroyImmediate(waitingButton.gameObject);
+                if (waitingButton != null)
+                    GameObject.DestroyImmediate(waitingButton.gameObject);
+
                 OnReceivedInfo?.Invoke(instance);
             }
         }
