@@ -23,8 +23,15 @@ namespace MRL
         public static ServerInfo serverInfos { get; private set; }
 
         private static bool inTraining;
+        private static GameEntryPoint entryPoint;
 
-        public static void FetchServerInfo() => GameModeManager.instance.StartCoroutine(FetchInfosLoop());
+        public static void FetchServerInfo()
+        {
+            if (entryPoint == null)
+                entryPoint = GameObject.FindObjectOfType<GameEntryPoint>();
+
+            entryPoint?.StartCoroutine(FetchInfosLoop());
+        }
 
         private static IEnumerator FetchInfosLoop()
         {
