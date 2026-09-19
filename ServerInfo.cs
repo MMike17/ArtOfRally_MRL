@@ -10,6 +10,7 @@ namespace MRL
     [Serializable]
     public class ServerInfo
     {
+        public string uploadURL;
         public SeasonInfo currentSeason;
         public RallyInfo currentRally;
 
