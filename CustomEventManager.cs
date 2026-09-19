@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,10 +13,10 @@ namespace MRL
     {
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
-        private const string USER_ID_HEADER = "header-name"; // TODO : Move this to config / Rename this to actual header name
-        private const string RESULTS_ENDPOINT = "test"; // TODO : Move this to config / Rename this to actual endpoint
-        private const int REQUEST_DELAY = 3;
-        private const int REQUEST_TRIES = 6;
+        private const string USER_ID_HEADER = "userID";
+        private const string RESULTS_ENDPOINT = "submission";
+        private const int REQUEST_DELAY = 4;
+        private const int REQUEST_TRIES = 5;
 
         const string INFO_FILE_URL = "https://gist.githubusercontent.com/MMike17/7b9ed3de87db0969d05877ac14f50fd5/raw/RallyEvent.txt";
         const string RESULTS_FILE_NAME = "RallyResults.mrl";
@@ -153,13 +155,15 @@ namespace MRL
                 yield break;
             }
 
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL + "/" + RESULTS_ENDPOINT, results.ToJson());
-            string header = $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}";
-            postRequest.SetRequestHeader(USER_ID_HEADER, header);
+            byte[] resultsData = Encoding.UTF8.GetBytes(results.ToJson());
+            List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+            formData.Add(new MultipartFormFileSection("file", resultsData, RESULTS_FILE_NAME, "application/json"));
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL + "/" + RESULTS_ENDPOINT, formData);
+            postRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
 
             yield return RequestLoop(
                 postRequest,
-                request => Main.Log("Results sent to discord bot with header : " + header),
+                request => Main.Log("Results sent to discord bot with header : " + postRequest.GetRequestHeader(USER_ID_HEADER)),
                 error => Main.Error("Couldn't send results to discord bot : " + error)
             );
         }
