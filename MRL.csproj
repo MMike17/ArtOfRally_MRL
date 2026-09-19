@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoroutineRunner.cs" />
     <Compile Include="MRL_Panel.cs" />
     <Compile Include="RallyResults.cs" />
     <Compile Include="Main.cs" />

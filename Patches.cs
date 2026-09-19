@@ -58,7 +58,7 @@ namespace MRL
             if (SceneManager.GetActiveScene().buildIndex != 3 || panel != null)
                 return;
 
-            __instance.StartCoroutine(WaitForInfos(__instance, instance =>
+            CoroutineRunner.StartCoroutine(WaitForInfos(__instance, instance =>
             {
                 Main.Try(nameof(MRLScreenBuilder), () =>
                 {

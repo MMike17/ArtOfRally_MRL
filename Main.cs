@@ -55,7 +55,7 @@ namespace MRL
                     Log("Loaded bundle \"" + BUNDLE_NAME + "\"");
             });
 
-            CustomEventManager.StartCoroutine(CustomEventManager.FetchServerInfos(null));
+            CoroutineRunner.StartCoroutine(CustomEventManager.FetchServerInfos(null));
             return true;
         }
 
