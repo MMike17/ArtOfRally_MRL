@@ -132,7 +132,7 @@ namespace MRL
 
         private static IEnumerator WaitForInfos(PanelManager instance, Action<PanelManager> OnReceivedInfo)
         {
-            if (CustomEventManager.serverInfos == null && !CustomEventManager.failedFetching)
+            if (CustomEventManager.serverInfos == null)
             {
                 Transform parent = instance.OnlineEventsSelect.transform.GetChild(0);
                 waitingButton = SpawnNewButton(
@@ -154,18 +154,20 @@ namespace MRL
                 waitingButton.interactable = false;
                 Main.Log(nameof(MRLScreenBuilder) + " : Waiting for server infos");
 
-                yield return new WaitUntil(() => CustomEventManager.serverInfos != null || CustomEventManager.failedFetching);
+                bool failed = false;
+                yield return CustomEventManager.FetchServerInfos(() => failed = true);
+
+                if (failed)
+                {
+                    waitingButton.GetComponentInChildren<Text>().text = "<i>couldn't retrieve server info</i>";
+                    yield break;
+                }
             }
 
-            if (CustomEventManager.failedFetching)
-                waitingButton.GetComponentInChildren<Text>().text = "<i>couldn't retrieve server info</i>";
-            else
-            {
-                if (waitingButton != null)
-                    GameObject.DestroyImmediate(waitingButton.gameObject);
+            if (waitingButton != null)
+                GameObject.DestroyImmediate(waitingButton.gameObject);
 
-                OnReceivedInfo?.Invoke(instance);
-            }
+            OnReceivedInfo?.Invoke(instance);
         }
     }
 

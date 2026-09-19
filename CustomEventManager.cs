@@ -11,6 +11,7 @@ namespace MRL
     {
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
+        private const string USER_ID_HEADER = "userID";
         private const int REQUEST_DELAY = 3;
         private const int REQUEST_TRIES = 6;
 
@@ -19,53 +20,29 @@ namespace MRL
         const int ENCRYPTION_KEY = 573; // TODO : This will get changed with rolling encryption
 
         public static bool IsRecording { get; private set; }
-        public static bool failedFetching { get; private set; }
         public static ServerInfo serverInfos { get; private set; }
 
         private static bool inTraining;
         private static GameEntryPoint entryPoint;
 
-        public static void FetchServerInfo()
+        public static void StartCoroutine(IEnumerator coroutine)
         {
             if (entryPoint == null)
                 entryPoint = GameObject.FindObjectOfType<GameEntryPoint>();
 
-            entryPoint?.StartCoroutine(FetchInfosLoop());
+            entryPoint?.StartCoroutine(coroutine);
         }
 
-        private static IEnumerator FetchInfosLoop()
+        public static IEnumerator FetchServerInfos(Action OnFail)
         {
-            serverInfos = null;
-            failedFetching = false;
-            int tries = 0;
+            UnityWebRequest infoRequest = UnityWebRequest.Get(INFO_FILE_URL);
+            Main.Log("Sending server infos request...");
 
-            while (tries < REQUEST_TRIES)
-            {
-                SendInfosRequest();
-                yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
-
-                if (serverInfos != null)
-                    yield break;
-
-                tries++;
-            }
-
-            failedFetching = true;
-        }
-
-        private static void SendInfosRequest()
-        {
-            Main.Log("Sending server request...");
-
-            UnityWebRequest request = UnityWebRequest.Get(INFO_FILE_URL);
-            AsyncOperation op = request.SendWebRequest();
-            op.completed += asyncOp =>
-            {
-                Main.Try("On received server infos", () =>
+            yield return RequestLoop(
+                infoRequest,
+                request =>
                 {
-                    if (request.isHttpError || request.isNetworkError)
-                        Main.Error("Couldn't retrieve rally info from server\n" + request.error);
-                    else
+                    Main.Try("On received server infos", () =>
                     {
                         string seasonJson = request.downloadHandler.text
                             .Split(new[] { SEASON_TAG }, StringSplitOptions.None)[1]
@@ -87,10 +64,15 @@ namespace MRL
                             Vector2.one / 2
                         );
 
-                        Main.Log("Received server info");
-                    }
-                });
-            };
+                        Main.Log("Received server infos");
+                    });
+                },
+                error =>
+                {
+                    Main.Error("Couldn't retrieve server infos : " + error);
+                    OnFail?.Invoke();
+                }
+            );
         }
 
         public static void StartRecording()
@@ -120,7 +102,8 @@ namespace MRL
                 RESULTS_FILE_NAME
             );
 
-            File.WriteAllText(filePath, EncryptResults(new RallyResults(playerResults)));
+            RallyResults results = new RallyResults(playerResults);
+            File.WriteAllText(filePath, EncryptResults(results));
             Main.Log("Saved rally results to " + filePath);
 
             if (Main.settings.openFolderOnResults)
@@ -131,7 +114,57 @@ namespace MRL
                 );
             }
 
+            if (Main.settings.sendResultsToMod)
+                StartCoroutine(SendResults(results));
+
             IsRecording = false;
+        }
+
+        private static IEnumerator RequestLoop(UnityWebRequest request, Action<UnityWebRequest> OnSuccess, Action<string> OnFail)
+        {
+            int tries = 0;
+
+            while (tries < REQUEST_TRIES)
+            {
+                AsyncOperation op = request.SendWebRequest();
+                yield return new WaitUntil(() => op.isDone);
+
+                if (request.isHttpError || request.isNetworkError)
+                    yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
+                else
+                {
+                    OnSuccess?.Invoke(request);
+                    yield break;
+                }
+
+                tries++;
+            }
+
+            OnFail?.Invoke(request.error);
+        }
+
+        private static IEnumerator SendResults(RallyResults results)
+        {
+            Main.Log("Started sending results to discord bot...");
+
+            bool failed = false;
+            yield return FetchServerInfos(() => failed = true);
+
+            if (failed)
+            {
+                Main.Error("Aborted sending results to discord bot");
+                yield break;
+            }
+
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL, results.ToJson());
+            string header = $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}";
+            postRequest.SetRequestHeader(USER_ID_HEADER, header);
+
+            yield return RequestLoop(
+                postRequest,
+                request => Main.Log("Results sent to discord bot with header : " + header),
+                error => Main.Error("Couldn't send results to discord bot : " + error)
+            );
         }
 
         private static string EncryptResults(RallyResults results)
