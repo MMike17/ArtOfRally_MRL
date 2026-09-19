@@ -14,7 +14,7 @@ namespace MRL
         public SeasonInfo currentSeason;
         public RallyInfo currentRally;
 
-        public ServerInfo(string seasonJson, string rallyJson)
+        public void SetSubClasses(string seasonJson, string rallyJson)
         {
             currentSeason = JsonUtility.FromJson<SeasonInfo>(seasonJson);
             currentRally = JsonUtility.FromJson<RallyInfo>(rallyJson);

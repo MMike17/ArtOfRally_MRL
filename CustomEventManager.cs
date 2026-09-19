@@ -11,7 +11,8 @@ namespace MRL
     {
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
-        private const string USER_ID_HEADER = "userID";
+        private const string USER_ID_HEADER = "header-name"; // TODO : Move this to config / Rename this to actual header name
+        private const string RESULTS_ENDPOINT = "test"; // TODO : Move this to config / Rename this to actual endpoint
         private const int REQUEST_DELAY = 3;
         private const int REQUEST_TRIES = 6;
 
@@ -23,15 +24,6 @@ namespace MRL
         public static ServerInfo serverInfos { get; private set; }
 
         private static bool inTraining;
-        private static GameEntryPoint entryPoint;
-
-        public static void StartCoroutine(IEnumerator coroutine)
-        {
-            if (entryPoint == null)
-                entryPoint = GameObject.FindObjectOfType<GameEntryPoint>();
-
-            entryPoint?.StartCoroutine(coroutine);
-        }
 
         public static IEnumerator FetchServerInfos(Action OnFail)
         {
@@ -52,7 +44,8 @@ namespace MRL
                             .Split(new[] { RALLY_TAG }, StringSplitOptions.None)[1]
                             .Split('}')[0] + '}';
 
-                        serverInfos = new ServerInfo(seasonJson, rallyJson);
+                        serverInfos = JsonUtility.FromJson<ServerInfo>(request.downloadHandler.text);
+                        serverInfos.SetSubClasses(seasonJson, rallyJson);
 
                         byte[] data = Convert.FromBase64String(serverInfos.currentRally.rallyPanel.Split(',')[1]);
                         Texture2D texture = new Texture2D(0, 0);
@@ -63,6 +56,11 @@ namespace MRL
                             new Rect(0, 0, texture.width, texture.height),
                             Vector2.one / 2
                         );
+
+                        // TEST
+                        serverInfos.currentRally.stageIndeces = new[] { serverInfos.currentRally.stageIndeces[0] };
+                        serverInfos.currentRally.stageWeathers = new[] { serverInfos.currentRally.stageWeathers[0] };
+                        // TEST
 
                         Main.Log("Received server infos");
                     });
@@ -115,7 +113,7 @@ namespace MRL
             }
 
             if (Main.settings.sendResultsToMod)
-                StartCoroutine(SendResults(results));
+                CoroutineRunner.StartCoroutine(SendResults(results));
 
             IsRecording = false;
         }
@@ -146,7 +144,6 @@ namespace MRL
         private static IEnumerator SendResults(RallyResults results)
         {
             Main.Log("Started sending results to discord bot...");
-
             bool failed = false;
             yield return FetchServerInfos(() => failed = true);
 
@@ -156,7 +153,7 @@ namespace MRL
                 yield break;
             }
 
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL, results.ToJson());
+            UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL + "/" + RESULTS_ENDPOINT, results.ToJson());
             string header = $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}";
             postRequest.SetRequestHeader(USER_ID_HEADER, header);
 
