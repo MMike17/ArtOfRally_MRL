@@ -13,13 +13,12 @@ namespace MRL
         public bool trainingMode = false;
         [Draw(DrawType.Auto)]
         public bool openFolderOnResults = true;
-        //[Draw(DrawType.Auto)]
+        [Draw(DrawType.Auto)]
         public bool sendResultsToMod = false;
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
         public bool disableInfoLogs = true;
-        //public bool disableInfoLogs = false;
 
         public override void Save(ModEntry modEntry) => Save(this, modEntry);
 
