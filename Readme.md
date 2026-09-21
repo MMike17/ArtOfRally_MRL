@@ -26,10 +26,16 @@ The mod will display the information relative to the current MRL rally and start
 
 You can also get details and lore on the current event from the Masters of Rally League discord in the `#rally-events` channel.
 
-The mod will open an explorer page by the time you finish the rally to the location of the result file.\
-You can post this file in `#submissions` on the Masters of Rally League discord server.
+When you finish the rally, the mod will generate a file containing the results of the rally, called `RallyResults.mrl`
 
 ![](Screenshots/File.png)
+
+Then it will behave differently depending on your settings :
+
+- **sendResultsToMod is enabled** : the mod will attempt to send results directly to the **MRL discord bot** (this requires you to link your art of rally user name and discord user name through the `/link-mod` MRL discord bot command)
+- **openFolderOnResults is enabled** : the mod will open an explorer page to the location of the rally results file
+
+If **sendResultsToMod** is disabled or if the operation failed, you can use the `/submission` command of the MRL discord bot to attach the `RallyResults.mrl` file. The bot will then post the results to the `#submissions` channel.
 
 Press Ctrl + F10 to open the mod manager menu.
 
@@ -37,6 +43,7 @@ Press Ctrl + F10 to open the mod manager menu.
 
 - **trainingMode** : training mode will enable the restarts and disable results generation. You can enable training mode during the rally.
 - **openFolderOnResults** : will open the folder in which the results will be written at the end of the rally.
+- **sendResultsToMod** : will attempt to send the results directly to the MRL discord bot.
 
 Disabling the mod in the manager will do nothing by default.
 

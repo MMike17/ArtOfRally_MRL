@@ -2,10 +2,10 @@
 	"Id": "MRL",
 	"DisplayName": "Masters of Rally League",
 	"Author": "MMike17",
-	"Version": "2.3.2",
+	"Version": "2.4.0",
 	"GameVersion": "1.5,5",
 	"AssemblyName": "MRL.dll",
 	"EntryMethod": "MRL.Main.Load",
-	"HomePage": "https://www.nexusmods.com/games/artofrally/mods/27",
+	"HomePage": "https://www.nexusmods.com/artofrally/mods/27",
 	"Repository": "https://raw.githubusercontent.com/MMike17/ArtOfRally_MRL/master/Repository.json"
 }
