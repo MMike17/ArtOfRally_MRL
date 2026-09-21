@@ -59,11 +59,6 @@ namespace MRL
                             Vector2.one / 2
                         );
 
-                        // TEST
-                        serverInfos.currentRally.stageIndeces = new[] { serverInfos.currentRally.stageIndeces[0] };
-                        serverInfos.currentRally.stageWeathers = new[] { serverInfos.currentRally.stageWeathers[0] };
-                        // TEST
-
                         Main.Log("Received server infos");
                     });
                 },
