@@ -13,8 +13,11 @@ namespace MRL
     {
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
+        private const string SEASON_CAR_TAG = "seasonCar: ";
+        private const string OPEN_CLASS_CAR_TAG = "openClassCar: ";
         private const string USER_ID_HEADER = "userID";
         private const string RESULTS_ENDPOINT = "submission";
+        private const string CAR_ENDPOINT = "car";
         private const int REQUEST_DELAY = 4;
         private const int REQUEST_TRIES = 5;
 
@@ -24,6 +27,8 @@ namespace MRL
 
         public static bool IsRecording { get; private set; }
         public static ServerInfo serverInfos { get; private set; }
+        public static string seasonCar { get; private set; }
+        public static string openClassCar { get; private set; }
 
         private static bool inTraining;
 
@@ -67,6 +72,37 @@ namespace MRL
                     Main.Error("Couldn't retrieve server infos : " + error);
                     OnFail?.Invoke();
                 }
+            );
+        }
+
+        public static IEnumerator FetchUserCar()
+        {
+            bool failed = false;
+            yield return FetchServerInfos(() => failed = true);
+
+            if (failed)
+            {
+                Main.Error("Aborted getting user car from discord bot");
+                yield break;
+            }
+
+            Main.Log("Sending user car request...");
+            UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + CAR_ENDPOINT);
+            getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+
+            yield return RequestLoop(
+                getRequest,
+                request =>
+                {
+                    string result = request.downloadHandler.text.Replace("\"", "");
+                    seasonCar = result.Split(new[] { SEASON_CAR_TAG }, StringSplitOptions.None)[1]
+                        .Split(',')[0].Replace("\"", " ");
+                    openClassCar = result.Split(new[] { OPEN_CLASS_CAR_TAG }, StringSplitOptions.None)[1]
+                        .Split(',')[0].Replace("\"", " ");
+
+                    Main.Log("Received user cars");
+                },
+                error => Main.Error("Couldn't get user car from discord bot : " + error)
             );
         }
 
@@ -122,7 +158,7 @@ namespace MRL
             while (tries < REQUEST_TRIES)
             {
                 AsyncOperation op = request.SendWebRequest();
-                yield return new WaitUntil(() => op.isDone);
+                yield return new WaitUntil(() => op.isDone || request.isNetworkError || request.isHttpError);
 
                 if (request.isHttpError || request.isNetworkError)
                     yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
@@ -135,7 +171,7 @@ namespace MRL
                 tries++;
             }
 
-            OnFail?.Invoke(request.error);
+            OnFail?.Invoke(request.error + (request.isHttpError ? " / " + request.downloadHandler.text : ""));
         }
 
         private static IEnumerator SendResults(RallyResults results)
