@@ -13,8 +13,8 @@ namespace MRL
     {
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
-        private const string SEASON_CAR_TAG = "seasonCar: ";
-        private const string OPEN_CLASS_CAR_TAG = "openClassCar: ";
+        private const string SEASON_CAR_TAG = "\"seasonCar\":\"";
+        private const string OPEN_CLASS_CAR_TAG = "\"openClassCar\":\"";
         private const string USER_ID_HEADER = "userID";
         private const string RESULTS_ENDPOINT = "submission";
         private const string CAR_ENDPOINT = "car";
@@ -94,13 +94,16 @@ namespace MRL
                 getRequest,
                 request =>
                 {
-                    string result = request.downloadHandler.text.Replace("\"", "");
-                    seasonCar = result.Split(new[] { SEASON_CAR_TAG }, StringSplitOptions.None)[1]
-                        .Split(',')[0].Replace("\"", " ");
-                    openClassCar = result.Split(new[] { OPEN_CLASS_CAR_TAG }, StringSplitOptions.None)[1]
-                        .Split(',')[0].Replace("\"", " ");
+                    Main.Try("Receive user cars", () =>
+                    {
+                        string result = request.downloadHandler.text;
+                        seasonCar = result.Split(new[] { SEASON_CAR_TAG }, StringSplitOptions.None)[1]
+                            .Split('"')[0];
+                        openClassCar = result.Split(new[] { OPEN_CLASS_CAR_TAG }, StringSplitOptions.None)[1]
+                            .Split('"')[0];
 
-                    Main.Log("Received user cars");
+                        Main.Log("Received user cars");
+                    });
                 },
                 error => Main.Error("Couldn't get user car from discord bot : " + error)
             );
