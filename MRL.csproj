@@ -124,6 +124,65 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Cars\Car_037.png" />
+    <EmbeddedResource Include="Data\Cars\Car_160j.png" />
+    <EmbeddedResource Include="Data\Cars\Car_2002.png" />
+    <EmbeddedResource Include="Data\Cars\Car_205.png" />
+    <EmbeddedResource Include="Data\Cars\Car_240.png" />
+    <EmbeddedResource Include="Data\Cars\Car_240rs.png" />
+    <EmbeddedResource Include="Data\Cars\Car_405.png" />
+    <EmbeddedResource Include="Data\Cars\Car_959.png" />
+    <EmbeddedResource Include="Data\Cars\Car_A1.png" />
+    <EmbeddedResource Include="Data\Cars\Car_AE86.png" />
+    <EmbeddedResource Include="Data\Cars\Car_AlfaRomeoAlfetta.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Alpine.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Ascona.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Celica.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Celica185.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Cosworth.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Datsun240z.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Deltona.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Escort_V1.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Escort_V2.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Evo6.png" />
+    <EmbeddedResource Include="Data\Cars\Car_F288.png" />
+    <EmbeddedResource Include="Data\Cars\Car_F308.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Fiat_131.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Focus.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Fulvia.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Kadette.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Lada.png" />
+    <EmbeddedResource Include="Data\Cars\Car_LanciaECV1.png" />
+    <EmbeddedResource Include="Data\Cars\Car_LanciaECV2.png" />
+    <EmbeddedResource Include="Data\Cars\Car_M1.png" />
+    <EmbeddedResource Include="Data\Cars\Car_M3.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Manta400.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Metro.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Mini.png" />
+    <EmbeddedResource Include="Data\Cars\Car_MR2.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Porsche_911_60.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Porsche_911_70.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Quattro_RS002.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Quattro_v3.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Renault17.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Renault5.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Renault5_Maxi.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Renault8.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Renault_A310.png" />
+    <EmbeddedResource Include="Data\Cars\Car_RS1700T.png" />
+    <EmbeddedResource Include="Data\Cars\Car_RS200.png" />
+    <EmbeddedResource Include="Data\Cars\Car_RS500.png" />
+    <EmbeddedResource Include="Data\Cars\Car_RX3.png" />
+    <EmbeddedResource Include="Data\Cars\Car_RX7.png" />
+    <EmbeddedResource Include="Data\Cars\Car_RX7S.png" />
+    <EmbeddedResource Include="Data\Cars\Car_S1E2.png" />
+    <EmbeddedResource Include="Data\Cars\Car_S4.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Skoda130rs.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Skoda200rs.png" />
+    <EmbeddedResource Include="Data\Cars\Car_Stratos.png" />
+    <EmbeddedResource Include="Data\Cars\Car_WRX.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PrepareBuild" AfterTargets="BeforeBuild">
     <CallTarget Targets="CleanFolder" />

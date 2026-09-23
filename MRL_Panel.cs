@@ -18,11 +18,60 @@ namespace MRL
         private Image flagImage;
         private Text subTitleText;
         private Text stagesText;
+        //private Text bestTimesText;
         private Image panelImage;
+        //private Image carImage;
         private Text deadlineText;
         private Text descriptionText;
         private DateTime deadline;
         private bool isSeason;
+
+        //const string CAR_SPRITES_PATH = ".Data.Cars.";
+
+        //string carName = CarManager.GetCurrentCarsListForClass(carClass)[carIndex].prefabName;
+        //Sprite result = carSprites.Find(item => item.name == carName);
+
+        //carSprites = new List<Sprite>();
+        //    string[] resourcesPaths = assembly.GetManifestResourceNames();
+        //string carsRootPath = modFolderName + CAR_SPRITES_PATH;
+        //int carsCount = 0;
+
+        //    foreach (string path in resourcesPaths)
+        //    {
+        //        // load car sprites
+        //        if (!path.Contains(CAR_SPRITES_PATH)) // skip non car paths
+        //            continue;
+
+        //        carsCount++;
+        //        LoadCarSprite(assembly, path, carsRootPath);
+        //    }
+
+        //private void LoadCarSprite(Assembly assembly, string path, string carsRootPath)
+        //{
+        //    using (Stream stream = assembly.GetManifestResourceStream(path))
+        //    {
+        //        if (stream == null)
+        //        {
+        //            Main.Error("Couldn't read local file at path : " + path + ". Make sure the files have been included in the build.");
+        //            return;
+        //        }
+
+        //        byte[] data;
+
+        //        using (MemoryStream memoryStream = new MemoryStream())
+        //        {
+        //            stream.CopyTo(memoryStream);
+        //            data = memoryStream.ToArray();
+        //        }
+
+        //        Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        //        texture.LoadImage(data);
+
+        //        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one / 2, 100);
+        //        sprite.name = Path.GetFileNameWithoutExtension(path.Replace(carsRootPath, ""));
+        //        carSprites.Add(sprite);
+        //    }
+        //}
 
         public void Setup(Font boldFont, Font standardFont, Action PopCarChoicePanel)
         {
@@ -30,9 +79,11 @@ namespace MRL
             flagImage = transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>();
             subTitleText = transform.GetChild(0).GetChild(2).GetComponent<Text>();
             stagesText = transform.GetChild(1).GetComponent<Text>();
-            panelImage = transform.GetChild(2).GetChild(0).GetComponent<Image>();
-            deadlineText = transform.GetChild(3).GetComponent<Text>();
-            descriptionText = transform.GetChild(4).GetComponent<Text>();
+            //bestTimesText = transform.GetChild(2).GetComponent<Text>();
+            panelImage = transform.GetChild(3).GetChild(0).GetComponent<Image>();
+            //carImage = transform.GetChild(4).GetComponent<Image>();
+            deadlineText = transform.GetChild(5).GetComponent<Text>();
+            descriptionText = transform.GetChild(6).GetComponent<Text>();
 
             UIScale uiScale = StyleManager.Instance().UIScale;
 
@@ -52,6 +103,11 @@ namespace MRL
             stagesText.gameObject.AddComponent<StyleText>();
             stagesText.fontSize = StyleConstants.Text.Header1.GetFontSize(uiScale);
             stagesText.lineSpacing = 1.5f;
+
+            //bestTimesText.font = standardFont;
+            //bestTimesText.gameObject.AddComponent<StyleText>();
+            //bestTimesText.fontSize = StyleConstants.Text.Header1.GetFontSize(uiScale);
+            //bestTimesText.lineSpacing = 1.5f;
 
             deadlineText.font = boldFont;
             deadlineText.gameObject.AddComponent<StyleText>();
@@ -127,7 +183,9 @@ namespace MRL
             }
 
             stagesText.text = stages;
+            //bestTimesText
             panelImage.sprite = infos.currentRally.panel;
+            //carImage
 
             if (deadline == default)
                 deadline = DateTimeOffset.FromUnixTimeSeconds(infos.currentRally.deadline).DateTime;
