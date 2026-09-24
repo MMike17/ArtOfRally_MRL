@@ -12,7 +12,9 @@ namespace MRL
     public class Main
     {
         const string BUNDLE_NAME = "masters_of_rally_league";
+
         public static bool enabled { get; private set; }
+        public static string modFolderName { get; private set; }
 
         /// <summary>This is provided by UnityModManager to log messages to the console</summary>
         public static ModEntry.ModLogger Logger;
@@ -55,6 +57,7 @@ namespace MRL
                     Log("Loaded bundle \"" + BUNDLE_NAME + "\"");
             });
 
+            modFolderName = new DirectoryInfo(modEntry.Path).Name;
             CoroutineRunner.StartCoroutine(CustomEventManager.FetchUserCar());
             return true;
         }
