@@ -58,7 +58,7 @@ namespace MRL
             });
 
             modFolderName = new DirectoryInfo(modEntry.Path).Name;
-            CoroutineRunner.StartCoroutine(CustomEventManager.FetchUserCar());
+            CoroutineRunner.StartCoroutine(CustomEventManager.FetchAllInfos());
             return true;
         }
 

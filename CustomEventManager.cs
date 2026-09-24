@@ -14,10 +14,13 @@ namespace MRL
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
         private const string SEASON_CAR_TAG = "\"seasonCar\":";
-        private const string OPEN_CLASS_CAR_TAG = "\"openClassCar\":";
+        private const string OPEN_CAR_TAG = "\"openClassCar\":";
+        private const string SEASON_RESULTS_TAG = "\"seasonResults\": [";
+        private const string OPEN_RESULTS_TAG = "\"openClassResults\": [";
         private const string USER_ID_HEADER = "userID";
         private const string RESULTS_ENDPOINT = "submission";
         private const string CAR_ENDPOINT = "car";
+        private const string TIMES_ENDPOINT = "times";
         private const int REQUEST_DELAY = 4;
         private const int REQUEST_TRIES = 5;
 
@@ -29,8 +32,25 @@ namespace MRL
         public static ServerInfo serverInfos { get; private set; }
         public static int seasonCar { get; private set; }
         public static int openClassCar { get; private set; }
+        public static string[] seasonResults { get; private set; }
+        public static string[] openClassResults { get; private set; }
 
         private static bool inTraining;
+
+        public static IEnumerator FetchAllInfos()
+        {
+            bool failed = false;
+            yield return FetchServerInfos(() => failed = true);
+
+            if (failed)
+            {
+                Main.Error("Aborted getting user car from discord bot");
+                yield break;
+            }
+
+            yield return FetchUserCar();
+            yield return FetchUserResults();
+        }
 
         public static IEnumerator FetchServerInfos(Action OnFail)
         {
@@ -77,16 +97,8 @@ namespace MRL
 
         public static IEnumerator FetchUserCar()
         {
-            bool failed = false;
-            yield return FetchServerInfos(() => failed = true);
-
-            if (failed)
-            {
-                Main.Error("Aborted getting user car from discord bot");
-                yield break;
-            }
-
             Main.Log("Sending user car request...");
+
             UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + CAR_ENDPOINT);
             getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
 
@@ -100,7 +112,7 @@ namespace MRL
                         seasonCar = int.Parse(result
                             .Split(new[] { SEASON_CAR_TAG }, StringSplitOptions.None)[1].Split(',')[0]);
                         openClassCar = int.Parse(result
-                            .Split(new[] { OPEN_CLASS_CAR_TAG }, StringSplitOptions.None)[1].Split('}')[0]);
+                            .Split(new[] { OPEN_CAR_TAG }, StringSplitOptions.None)[1].Split('}')[0]);
 
                         MRL_Panel.LoadCarSprites();
                         Main.Log("Received user cars");
@@ -108,6 +120,39 @@ namespace MRL
                 },
                 error => Main.Error("Couldn't get user car from discord bot : " + error)
             );
+        }
+
+        // TODO : Test this for proper results
+        public static IEnumerator FetchUserResults()
+        {
+            Main.Log("Sending user results request...");
+
+            UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + TIMES_ENDPOINT);
+            getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+
+            yield return RequestLoop(
+                getRequest,
+                request =>
+                {
+                    Main.Try("Receive user times", () =>
+                    {
+                        seasonResults = ParseAndSanitizeResults(request.downloadHandler.text, SEASON_RESULTS_TAG);
+                        openClassResults = ParseAndSanitizeResults(request.downloadHandler.text, OPEN_RESULTS_TAG);
+
+                        Main.Log("Received user results");
+                    });
+                },
+                error => Main.Error("Couldn't get user results from discord bot : " + error)
+            );
+
+            string[] ParseAndSanitizeResults(string text, string startTag)
+            {
+                return text.Split(new[] { startTag }, StringSplitOptions.None)[1]
+                    .Split(']')[0]
+                    .Replace(" ", "")
+                    .Replace("\"", "")
+                    .Split(',');
+            }
         }
 
         public static void StartRecording()
@@ -198,7 +243,11 @@ namespace MRL
 
             yield return RequestLoop(
                 postRequest,
-                request => Main.Log("Results sent to discord bot with header : " + postRequest.GetRequestHeader(USER_ID_HEADER)),
+                request =>
+                {
+                    Main.Log("Results sent to discord bot with header : " + postRequest.GetRequestHeader(USER_ID_HEADER));
+                    CoroutineRunner.StartCoroutine(FetchUserResults()); // update results from server
+                },
                 error => Main.Error("Couldn't send results to discord bot : " + error)
             );
         }
