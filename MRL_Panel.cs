@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using Bia.Countries.Iso3166;
 using UnityEngine;
@@ -13,6 +15,11 @@ namespace MRL
     /// <summary>Screen that displays infos about MRL events</summary>
     public class MRL_Panel : Panel
     {
+        private static Sprite seasonCar;
+        private static Sprite openClassCar;
+
+        const string CAR_SPRITES_PATH = ".Data.Cars.";
+
         private Button mainButton;
         private Text titleText;
         private Image flagImage;
@@ -20,58 +27,13 @@ namespace MRL
         private Text stagesText;
         //private Text bestTimesText;
         private Image panelImage;
-        //private Image carImage;
+        private Image carImage;
         private Text deadlineText;
         private Text descriptionText;
         private DateTime deadline;
         private bool isSeason;
 
-        //const string CAR_SPRITES_PATH = ".Data.Cars.";
-
-        //string carName = CarManager.GetCurrentCarsListForClass(carClass)[carIndex].prefabName;
-        //Sprite result = carSprites.Find(item => item.name == carName);
-
-        //carSprites = new List<Sprite>();
-        //    string[] resourcesPaths = assembly.GetManifestResourceNames();
-        //string carsRootPath = modFolderName + CAR_SPRITES_PATH;
-        //int carsCount = 0;
-
-        //    foreach (string path in resourcesPaths)
-        //    {
-        //        // load car sprites
-        //        if (!path.Contains(CAR_SPRITES_PATH)) // skip non car paths
-        //            continue;
-
-        //        carsCount++;
-        //        LoadCarSprite(assembly, path, carsRootPath);
-        //    }
-
-        //private void LoadCarSprite(Assembly assembly, string path, string carsRootPath)
-        //{
-        //    using (Stream stream = assembly.GetManifestResourceStream(path))
-        //    {
-        //        if (stream == null)
-        //        {
-        //            Main.Error("Couldn't read local file at path : " + path + ". Make sure the files have been included in the build.");
-        //            return;
-        //        }
-
-        //        byte[] data;
-
-        //        using (MemoryStream memoryStream = new MemoryStream())
-        //        {
-        //            stream.CopyTo(memoryStream);
-        //            data = memoryStream.ToArray();
-        //        }
-
-        //        Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-        //        texture.LoadImage(data);
-
-        //        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one / 2, 100);
-        //        sprite.name = Path.GetFileNameWithoutExtension(path.Replace(carsRootPath, ""));
-        //        carSprites.Add(sprite);
-        //    }
-        //}
+        // TODO : Skip car selection and force select car (if not in training mode AND has car from server)
 
         public void Setup(Font boldFont, Font standardFont, Action PopCarChoicePanel)
         {
@@ -80,8 +42,9 @@ namespace MRL
             subTitleText = transform.GetChild(0).GetChild(2).GetComponent<Text>();
             stagesText = transform.GetChild(1).GetComponent<Text>();
             //bestTimesText = transform.GetChild(2).GetComponent<Text>();
+            transform.GetChild(2).GetComponent<Text>().enabled = false; // TEST
             panelImage = transform.GetChild(3).GetChild(0).GetComponent<Image>();
-            //carImage = transform.GetChild(4).GetComponent<Image>();
+            carImage = transform.GetChild(4).GetComponent<Image>();
             deadlineText = transform.GetChild(5).GetComponent<Text>();
             descriptionText = transform.GetChild(6).GetComponent<Text>();
 
@@ -117,7 +80,7 @@ namespace MRL
             descriptionText.gameObject.AddComponent<StyleText>();
             descriptionText.fontSize = StyleConstants.Text.Standard.GetFontSize(uiScale);
 
-            mainButton = transform.GetChild(5).GetComponent<Button>();
+            mainButton = transform.GetChild(7).GetComponent<Button>();
             mainButton.onClick.RemoveAllListeners();
             mainButton.onClick.AddListener(() =>
             {
@@ -185,7 +148,9 @@ namespace MRL
             stagesText.text = stages;
             //bestTimesText
             panelImage.sprite = infos.currentRally.panel;
-            //carImage
+
+            carImage.enabled = isSeason ? seasonCar != null : openClassCar != null;
+            carImage.sprite = isSeason ? seasonCar : openClassCar;
 
             if (deadline == default)
                 deadline = DateTimeOffset.FromUnixTimeSeconds(infos.currentRally.deadline).DateTime;
@@ -195,5 +160,63 @@ namespace MRL
         }
 
         private string FormatStageName(Stage stage) => stage.Name.Substring(0, 1).ToUpper() + stage.Name.Substring(1);
+
+        public static void LoadCarSprites()
+        {
+            seasonCar = LoadCarSprite(CustomEventManager.seasonCar);
+            openClassCar = LoadCarSprite(CustomEventManager.openClassCar);
+        }
+
+        private static Sprite LoadCarSprite(int carIndex)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string carsRootPath = Main.modFolderName + CAR_SPRITES_PATH;
+            string[] resourcesPaths = assembly.GetManifestResourceNames();
+
+            Car selectedCar = CarManager.GetCurrentCarsListForClass(CustomEventManager.serverInfos.currentSeason.group)[carIndex];
+
+            if (selectedCar == null)
+            {
+                Main.Error("Couldn't find Car for index \"" + carIndex + "\"");
+                return null;
+            }
+
+            string picturePath = resourcesPaths.FirstOrDefault(item =>
+                item.Contains(CAR_SPRITES_PATH) && item.Contains(selectedCar.prefabName));
+
+            if (string.IsNullOrEmpty(picturePath))
+            {
+                Main.Error("Couldn't find resource path for car at index \"" + carIndex +
+                    "\", did you include that car picture in the files ?");
+                return null;
+            }
+
+            using (Stream stream = assembly.GetManifestResourceStream(picturePath))
+            {
+                if (stream == null)
+                {
+                    Main.Error("Couldn't read local file at path \"" + picturePath +
+                        "\". Make sure the files have been included in the build.");
+
+                    return null;
+                }
+
+                byte[] data;
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    stream.CopyTo(memoryStream);
+                    data = memoryStream.ToArray();
+                }
+
+                Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                texture.LoadImage(data);
+
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one / 2, 100);
+                sprite.name = selectedCar.name;
+
+                return sprite;
+            }
+        }
     }
 }
