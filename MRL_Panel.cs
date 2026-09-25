@@ -25,7 +25,7 @@ namespace MRL
         private Image flagImage;
         private Text subTitleText;
         private Text stagesText;
-        //private Text bestTimesText;
+        private Text currentTimesText;
         private Image panelImage;
         private Image carImage;
         private Text deadlineText;
@@ -41,8 +41,8 @@ namespace MRL
             flagImage = transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>();
             subTitleText = transform.GetChild(0).GetChild(2).GetComponent<Text>();
             stagesText = transform.GetChild(1).GetComponent<Text>();
-            //bestTimesText = transform.GetChild(2).GetComponent<Text>();
-            transform.GetChild(2).GetComponent<Text>().enabled = false; // TEST
+            currentTimesText = transform.GetChild(2).GetComponent<Text>();
+            //transform.GetChild(2).GetComponent<Text>().enabled = false; // TEST
             panelImage = transform.GetChild(3).GetChild(0).GetComponent<Image>();
             carImage = transform.GetChild(4).GetComponent<Image>();
             deadlineText = transform.GetChild(5).GetComponent<Text>();
@@ -67,10 +67,10 @@ namespace MRL
             stagesText.fontSize = StyleConstants.Text.Header1.GetFontSize(uiScale);
             stagesText.lineSpacing = 1.5f;
 
-            //bestTimesText.font = standardFont;
-            //bestTimesText.gameObject.AddComponent<StyleText>();
-            //bestTimesText.fontSize = StyleConstants.Text.Header1.GetFontSize(uiScale);
-            //bestTimesText.lineSpacing = 1.5f;
+            currentTimesText.font = standardFont;
+            currentTimesText.gameObject.AddComponent<StyleText>();
+            currentTimesText.fontSize = StyleConstants.Text.Header1.GetFontSize(uiScale);
+            currentTimesText.lineSpacing = 1.5f;
 
             deadlineText.font = boldFont;
             deadlineText.gameObject.AddComponent<StyleText>();
@@ -146,7 +146,13 @@ namespace MRL
             }
 
             stagesText.text = stages;
-            //bestTimesText
+
+            string[] results = isSeason ? CustomEventManager.seasonResults : CustomEventManager.openClassResults;
+            currentTimesText.enabled = results != null && results.Length > 0;
+
+            if (currentTimesText.enabled)
+                currentTimesText.text = "\n" + string.Join("\n", results);
+
             panelImage.sprite = infos.currentRally.panel;
 
             carImage.enabled = isSeason ? seasonCar != null : openClassCar != null;
