@@ -86,19 +86,43 @@ namespace MRL
             {
                 Main.Try("Setup MRL rally", () =>
                 {
+                    // set season
                     ServerInfo info = CustomEventManager.serverInfos;
                     GameModeManager.SetGameMode(GameModeManager.GAME_MODES.CUSTOM);
                     GameModeManager.RallyManager.SeasonData = info.GenerateSeason();
 
+                    // set group
                     CarClass group = isSeason ? info.currentSeason.group : info.currentRally.openClassGroup;
                     CarManager.SetChosenClass(group);
                     SaveGame.Save();
 
-                    CarChooserHelper chooser = GameObject.FindObjectOfType<CarChooserHelper>();
+                    // setup chooser
+                    CarChooserHelper helper = GameObject.FindObjectOfType<CarChooserHelper>();
                     ServerInfo infos = CustomEventManager.serverInfos;
-                    chooser.GroupTitle.carClass = group;
-                    chooser.InitHideClass();
-                    chooser.GroupTitle.ConstructString(group, (isSeason ? "Season" : "Open class") + " rally");
+                    helper.GroupTitle.carClass = group;
+                    helper.InitHideClass();
+                    helper.GroupTitle.ConstructString(group, (isSeason ? "Season" : "Open class") + " rally");
+
+                    // pre-select car
+                    //int carIndex = isSeason ? CustomEventManager.seasonCar : CustomEventManager.openClassCar;
+
+                    //if (carIndex != -1)
+                    //{
+                    //    helper.CarButton.index = carIndex;
+                    //    CarManager.SetChosenCar(carIndex);
+                    //    helper.CarButton.carChooserManager.ChangeCar(carIndex);
+                    //    helper.CarButton.UpdateOptionTextAndArrows();
+                    //    Main.InvokeMethod(helper.CarButton, "UpdateCarSpecs", BindingFlags.Instance, null);
+                    //    helper.LiveryButton.UpdateIndexOfLivery();
+                    //    helper.LiveryButton.UpdateOptionTextAndArrows();
+
+                    //    helper.CarButton.gameObject.SetActive(false);
+                    //    helper.CarButton.enabled = false;
+                    //    helper.panel.FirstSelected = helper.LiveryButton.gameObject;
+                    //    // TODO : Disable random button
+                    //    // TODO : I'm getting the liveries from the 1st car instead of what I selected
+                    //    //EventSystem.current.SetSelectedGameObject(helper.LiveryButton.gameObject);
+                    //}
 
                     PopCarChoicePanel?.Invoke();
                 });
@@ -127,7 +151,7 @@ namespace MRL
             subTitleText.text = $"{infos.currentRally.country} - {infos.currentSeason.year} - " +
                 $"{(isSeason ? "Season" : "Open class")} rally";
 
-            Country country = Countries.GetCountryByPartialFullName(infos.currentRally.country)[0];
+            Country country = Countries.GetCountryByPartialShortName(infos.currentRally.country)[0];
             flagImage.sprite = Resources.Load<Sprite>($"Sprites/CountryFlags/{country.Alpha2}");
 
             Dictionary<Areas, Area> areaDictionary = Main.GetField<Dictionary<Areas, Area>, AreaManager>(
