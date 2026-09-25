@@ -12,6 +12,9 @@ namespace MRL
         [Draw(DrawType.Auto)]
         public bool trainingMode = false;
         [Draw(DrawType.Auto)]
+        public bool autoSeletCar = true;
+
+        [Draw(DrawType.Auto)]
         public bool openFolderOnResults = true;
         [Draw(DrawType.Auto)]
         public bool sendResultsToMod = false;
@@ -19,6 +22,7 @@ namespace MRL
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
         public bool disableInfoLogs = true;
+        //public bool disableInfoLogs = false;
 
         public override void Save(ModEntry modEntry) => Save(this, modEntry);
 
