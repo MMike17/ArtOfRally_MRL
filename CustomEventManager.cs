@@ -11,20 +11,20 @@ namespace MRL
 {
     class CustomEventManager
     {
+        const string INFO_FILE_URL = "https://gist.githubusercontent.com/MMike17/7b9ed3de87db0969d05877ac14f50fd5/raw/RallyEvent.txt";
         private const string SEASON_TAG = "  \"currentSeason\": ";
         private const string RALLY_TAG = "  \"currentRally\": ";
         private const string SEASON_CAR_TAG = "\"seasonCar\":";
         private const string OPEN_CAR_TAG = "\"openClassCar\":";
-        private const string SEASON_RESULTS_TAG = "\"seasonResults\": [";
-        private const string OPEN_RESULTS_TAG = "\"openClassResults\": [";
+        private const string SEASON_RESULTS_TAG = "\"seasonResults\":[";
+        private const string OPEN_RESULTS_TAG = "\"openClassResults\":[";
         private const string USER_ID_HEADER = "userID";
         private const string RESULTS_ENDPOINT = "submission";
         private const string CAR_ENDPOINT = "car";
         private const string TIMES_ENDPOINT = "times";
         private const int REQUEST_DELAY = 4;
-        private const int REQUEST_TRIES = 5;
+        private const int REQUEST_TRIES = 4;
 
-        const string INFO_FILE_URL = "https://gist.githubusercontent.com/MMike17/7b9ed3de87db0969d05877ac14f50fd5/raw/RallyEvent.txt";
         const string RESULTS_FILE_NAME = "RallyResults.mrl";
         const int ENCRYPTION_KEY = 573; // TODO : This will get changed with rolling encryption
 
@@ -54,8 +54,8 @@ namespace MRL
 
         public static IEnumerator FetchServerInfos(Action OnFail)
         {
-            UnityWebRequest infoRequest = UnityWebRequest.Get(INFO_FILE_URL);
             Main.Log("Sending server infos request...");
+            UnityWebRequest infoRequest = UnityWebRequest.Get(INFO_FILE_URL);
 
             yield return RequestLoop(
                 infoRequest,
@@ -122,7 +122,6 @@ namespace MRL
             );
         }
 
-        // TODO : Test this for proper results
         public static IEnumerator FetchUserResults()
         {
             Main.Log("Sending user results request...");
