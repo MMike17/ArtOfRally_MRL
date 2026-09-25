@@ -114,6 +114,16 @@ namespace MRL
                         openClassCar = int.Parse(result
                             .Split(new[] { OPEN_CAR_TAG }, StringSplitOptions.None)[1].Split('}')[0]);
 
+                        //if (seasonCar != -1)
+                        //    Main.Log("seasonCar : " + CarManager.GetCurrentCarsListForClass(serverInfos.currentSeason.group)[seasonCar].name);
+                        //else
+                        //    Main.Log("seasonCar : " + seasonCar);
+
+                        //if (openClassCar != -1)
+                        //    Main.Log("openClassCar : " + CarManager.GetCurrentCarsListForClass(serverInfos.currentRally.openClassGroup)[seasonCar].name);
+                        //else
+                        //    Main.Log("openClassCar : " + openClassCar);
+
                         MRL_Panel.LoadCarSprites();
                         Main.Log("Received user cars");
                     });

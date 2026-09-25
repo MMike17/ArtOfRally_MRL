@@ -12,9 +12,6 @@ namespace MRL
         [Draw(DrawType.Auto)]
         public bool trainingMode = false;
         [Draw(DrawType.Auto)]
-        public bool autoSeletCar = true;
-
-        [Draw(DrawType.Auto)]
         public bool openFolderOnResults = true;
         [Draw(DrawType.Auto)]
         public bool sendResultsToMod = false;
