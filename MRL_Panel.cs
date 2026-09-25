@@ -193,8 +193,11 @@ namespace MRL
 
         public static void LoadCarSprites()
         {
-            seasonCar = LoadCarSprite(CustomEventManager.seasonCar, true);
-            openClassCar = LoadCarSprite(CustomEventManager.openClassCar, false);
+            if (CustomEventManager.seasonCar != -1)
+                seasonCar = LoadCarSprite(CustomEventManager.seasonCar, true);
+
+            if (CustomEventManager.openClassCar != -1)
+                openClassCar = LoadCarSprite(CustomEventManager.openClassCar, false);
         }
 
         private static Sprite LoadCarSprite(int carIndex, bool isSeason)
