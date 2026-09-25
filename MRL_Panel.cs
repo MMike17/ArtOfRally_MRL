@@ -169,17 +169,20 @@ namespace MRL
 
         public static void LoadCarSprites()
         {
-            seasonCar = LoadCarSprite(CustomEventManager.seasonCar);
-            openClassCar = LoadCarSprite(CustomEventManager.openClassCar);
+            seasonCar = LoadCarSprite(CustomEventManager.seasonCar, true);
+            openClassCar = LoadCarSprite(CustomEventManager.openClassCar, false);
         }
 
-        private static Sprite LoadCarSprite(int carIndex)
+        private static Sprite LoadCarSprite(int carIndex, bool isSeason)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             string carsRootPath = Main.modFolderName + CAR_SPRITES_PATH;
             string[] resourcesPaths = assembly.GetManifestResourceNames();
 
-            Car selectedCar = CarManager.GetCurrentCarsListForClass(CustomEventManager.serverInfos.currentSeason.group)[carIndex];
+            Car selectedCar = CarManager.GetCurrentCarsListForClass(isSeason ?
+                CustomEventManager.serverInfos.currentSeason.group :
+                CustomEventManager.serverInfos.currentRally.openClassGroup
+            )[carIndex];
 
             if (selectedCar == null)
             {
