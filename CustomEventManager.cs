@@ -54,11 +54,10 @@ namespace MRL
 
         public static IEnumerator FetchServerInfos(Action OnFail)
         {
-            Main.Log("Sending server infos request...");
-            UnityWebRequest infoRequest = UnityWebRequest.Get(INFO_FILE_URL);
+            Main.Log("Starting server infos request...");
 
             yield return RequestLoop(
-                infoRequest,
+                () => UnityWebRequest.Get(INFO_FILE_URL),
                 request =>
                 {
                     Main.Try("On received server infos", () =>
@@ -97,13 +96,15 @@ namespace MRL
 
         public static IEnumerator FetchUserCar()
         {
-            Main.Log("Sending user car request...");
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + CAR_ENDPOINT);
-            getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+            Main.Log("Starting user car request...");
 
             yield return RequestLoop(
-                getRequest,
+                () =>
+                {
+                    UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + CAR_ENDPOINT);
+                    getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+                    return getRequest;
+                },
                 request =>
                 {
                     Main.Try("Receive user cars", () =>
@@ -134,13 +135,15 @@ namespace MRL
 
         public static IEnumerator FetchUserResults()
         {
-            Main.Log("Sending user results request...");
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + TIMES_ENDPOINT);
-            getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+            Main.Log("Starting user results request...");
 
             yield return RequestLoop(
-                getRequest,
+                () =>
+                {
+                    UnityWebRequest getRequest = UnityWebRequest.Get(serverInfos.uploadURL + "/" + TIMES_ENDPOINT);
+                    getRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+                    return getRequest;
+                },
                 request =>
                 {
                     Main.Try("Receive user times", () =>
@@ -209,17 +212,26 @@ namespace MRL
             IsRecording = false;
         }
 
-        private static IEnumerator RequestLoop(UnityWebRequest request, Action<UnityWebRequest> OnSuccess, Action<string> OnFail)
+        private static IEnumerator RequestLoop(
+            Func<UnityWebRequest> GenerateRequest,
+            Action<UnityWebRequest> OnSuccess,
+            Action<string> OnFail)
         {
             int tries = 0;
+            UnityWebRequest request = null;
 
             while (tries < REQUEST_TRIES)
             {
+                request = GenerateRequest();
                 AsyncOperation op = request.SendWebRequest();
+
                 yield return new WaitUntil(() => op.isDone || request.isNetworkError || request.isHttpError);
 
                 if (request.isHttpError || request.isNetworkError)
+                {
+                    Main.Log("Web request failed, waiting " + Math.Pow(REQUEST_DELAY, tries) + "s before retrying");
                     yield return new WaitForSeconds((float)Math.Pow(REQUEST_DELAY, tries));
+                }
                 else
                 {
                     OnSuccess?.Invoke(request);
@@ -227,6 +239,7 @@ namespace MRL
                 }
 
                 tries++;
+                Main.Log("Request loop itteration : " + tries + " / " + REQUEST_TRIES);
             }
 
             OnFail?.Invoke(request.error + (request.isHttpError ? " / " + request.downloadHandler.text : ""));
@@ -247,14 +260,17 @@ namespace MRL
             byte[] resultsData = Encoding.UTF8.GetBytes(results.ToJson());
             List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
             formData.Add(new MultipartFormFileSection("file", resultsData, RESULTS_FILE_NAME, "application/json"));
-            UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL + "/" + RESULTS_ENDPOINT, formData);
-            postRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
 
             yield return RequestLoop(
-                postRequest,
+                () =>
+                {
+                    UnityWebRequest postRequest = UnityWebRequest.Post(serverInfos.uploadURL + "/" + RESULTS_ENDPOINT, formData);
+                    postRequest.SetRequestHeader(USER_ID_HEADER, $"{Platform.Get().GetPlatformType()}:{Platform.Get().GetUserName()}");
+                    return postRequest;
+                },
                 request =>
                 {
-                    Main.Log("Results sent to discord bot with header : " + postRequest.GetRequestHeader(USER_ID_HEADER));
+                    Main.Log("Results sent to discord bot with header : " + request.GetRequestHeader(USER_ID_HEADER));
                     CoroutineRunner.StartCoroutine(FetchUserResults()); // update results from server
                 },
                 error => Main.Error("Couldn't send results to discord bot : " + error)
