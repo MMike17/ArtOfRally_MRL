@@ -153,7 +153,7 @@ namespace MRL
 
             if (currentTimesText.enabled)
             {
-                string text = "Total : " + results[results.Length - 1];
+                string text = results[results.Length - 1];
 
                 for (int i = 0; i < results.Length - 1; i++)
                     text += '\n' + results[i];
