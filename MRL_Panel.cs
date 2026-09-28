@@ -33,8 +33,6 @@ namespace MRL
         private DateTime deadline;
         private bool isSeason;
 
-        // TODO : Skip car selection and force select car (if not in training mode AND has car from server)
-
         public void Setup(Font boldFont, Font standardFont, Action PopCarChoicePanel)
         {
             titleText = transform.GetChild(0).GetChild(0).GetComponent<Text>();
@@ -42,7 +40,6 @@ namespace MRL
             subTitleText = transform.GetChild(0).GetChild(2).GetComponent<Text>();
             stagesText = transform.GetChild(1).GetComponent<Text>();
             currentTimesText = transform.GetChild(2).GetComponent<Text>();
-            //transform.GetChild(2).GetComponent<Text>().enabled = false; // TEST
             panelImage = transform.GetChild(3).GetChild(0).GetComponent<Image>();
             carImage = transform.GetChild(4).GetComponent<Image>();
             deadlineText = transform.GetChild(5).GetComponent<Text>();
@@ -103,32 +100,12 @@ namespace MRL
                     helper.InitHideClass();
                     helper.GroupTitle.ConstructString(group, (isSeason ? "Season" : "Open class") + " rally");
 
-                    // pre-select car
-                    //int carIndex = isSeason ? CustomEventManager.seasonCar : CustomEventManager.openClassCar;
-
-                    //if (carIndex != -1)
-                    //{
-                    //    helper.CarButton.index = carIndex;
-                    //    CarManager.SetChosenCar(carIndex);
-                    //    helper.CarButton.carChooserManager.ChangeCar(carIndex);
-                    //    helper.CarButton.UpdateOptionTextAndArrows();
-                    //    Main.InvokeMethod(helper.CarButton, "UpdateCarSpecs", BindingFlags.Instance, null);
-                    //    helper.LiveryButton.UpdateIndexOfLivery();
-                    //    helper.LiveryButton.UpdateOptionTextAndArrows();
-
-                    //    helper.CarButton.gameObject.SetActive(false);
-                    //    helper.CarButton.enabled = false;
-                    //    helper.panel.FirstSelected = helper.LiveryButton.gameObject;
-                    //    // TODO : Disable random button
-                    //    // TODO : I'm getting the liveries from the 1st car instead of what I selected
-                    //    //EventSystem.current.SetSelectedGameObject(helper.LiveryButton.gameObject);
-                    //}
-
                     PopCarChoicePanel?.Invoke();
                 });
             });
 
             FirstSelected = mainButton.gameObject;
+            AlwaysResetLastSelected = true;
 
             OnPanelPushedEvent = new UnityEngine.Events.UnityEvent();
             OnPanelPushedEvent.AddListener(() => EventSystem.current.SetSelectedGameObject(mainButton.gameObject));
@@ -175,7 +152,14 @@ namespace MRL
             currentTimesText.enabled = results != null && results.Length > 0;
 
             if (currentTimesText.enabled)
-                currentTimesText.text = "\n" + string.Join("\n", results);
+            {
+                string text = "Total : " + results[results.Length - 1];
+
+                for (int i = 0; i < results.Length - 1; i++)
+                    text += '\n' + results[i];
+
+                currentTimesText.text = text;
+            }
 
             panelImage.sprite = infos.currentRally.panel;
 
