@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static AreaManager;
+using static Car;
 
 namespace MRL
 {
@@ -204,6 +207,166 @@ namespace MRL
                         ButtonUtilities.HideButtonAndUpdateNavigation(__instance.RestartButton);
                 }
             });
+        }
+    }
+
+    [HarmonyPatch(typeof(PanelManager), nameof(PanelManager.AddPanelAddToHistory), new[] { typeof(Panel) })]
+    static class PanelPatcher
+    {
+        const string RESULTS_PANEL = "ResultsScreen";
+
+        [HarmonyPostfix]
+        static void CheckPanel(Panel panel)
+        {
+            if (!Main.enabled && !CustomEventManager.IsRecording)
+                return;
+
+            Main.Try(nameof(CheckPanel), () =>
+            {
+                ServerInfo infos = CustomEventManager.serverInfos;
+
+                if (panel.name == RESULTS_PANEL)
+                {
+                    Main.DelayCall(() =>
+                    {
+                        GroupTitle title = panel.GetComponentInChildren<GroupTitle>();
+                        title.SetString(
+                            infos.currentRally.name + " | " + infos.currentSeason.year + " | " + infos.currentRally.country);
+                        panel.transform.Find("TextSubtitleStage").GetComponent<Text>().text = "Rally results";
+                    });
+                }
+            });
+        }
+    }
+
+    [HarmonyPatch(typeof(GroupTitle), nameof(GroupTitle.ConstructStringUsingCareerData))]
+    static class TitlePatcher
+    {
+        static string lastTitle;
+
+        [HarmonyPrefix]
+        static bool FixTitle(GroupTitle __instance)
+        {
+            if (Main.enabled && CustomEventManager.IsRecording)
+            {
+                Main.Try(nameof(FixTitle), () =>
+                {
+                    ServerInfo info = CustomEventManager.serverInfos;
+                    string divider = Main.GetField<string, GroupTitle>(__instance, "divider", BindingFlags.Instance);
+                    lastTitle = info.currentRally.name + " " + divider + " " + info.currentSeason.year;
+                    Main.SetField(__instance, "suffix", BindingFlags.Instance, lastTitle);
+                    __instance.SetString(lastTitle);
+                });
+
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(StageIntroCinematic), "DoCinematic")]
+    static class RallyIntroPatcher
+    {
+        public static StageIntroCinematic instance;
+
+        static void Prefix(StageIntroCinematic __instance)
+        {
+            if (Main.enabled && CustomEventManager.IsRecording)
+                instance = __instance;
+        }
+    }
+
+    [HarmonyPatch(typeof(LeanTween))]
+    static class RallyIntroFixer
+    {
+        [HarmonyPatch(nameof(LeanTween.alphaText), new[] { typeof(RectTransform), typeof(float), typeof(float) })]
+        [HarmonyPostfix]
+        static void FixRallyIntro()
+        {
+            if (Main.enabled && RallyIntroPatcher.instance != null && CustomEventManager.IsRecording)
+            {
+                Main.Try(nameof(FixRallyIntro), () =>
+                {
+                    bool checkText = RallyIntroPatcher.instance.FirstText.text ==
+                        AreaManager.GetAreaStringLocalized(GameModeManager.GetRallyDataCurrentGameMode().CurrentArea).ToLower();
+
+                    if (checkText)
+                    {
+                        ServerInfo.RallyInfo infos = CustomEventManager.serverInfos.currentRally;
+                        RallyIntroPatcher.instance.FirstText.text = infos.country;
+                        RallyIntroPatcher.instance.SecondText.text = infos.name;
+                        Main.Log("Fixing rally title");
+                    }
+                });
+            }
+        }
+
+        [HarmonyPatch(nameof(LeanTween.alphaCanvas))]
+        [HarmonyPrefix]
+        static void FixLeaderboardTitle()
+        {
+            if (Main.enabled && CustomEventManager.IsRecording && RallyResultPatcher.title != null)
+            {
+                Main.Try(nameof(FixLeaderboardTitle), () =>
+                {
+                    RallyResultPatcher.title.text = CustomEventManager.serverInfos.currentRally.name;
+                });
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(LoadingScreen), "SetGameModeTitle", new Type[] { typeof(CarClass), typeof(int), typeof(Areas) })]
+    static class LoadingPatcher
+    {
+        static bool Prefix(LoadingScreen __instance)
+        {
+            if (Main.enabled && CustomEventManager.IsRecording)
+            {
+                ServerInfo infos = CustomEventManager.serverInfos;
+
+                Main.Try(nameof(LoadingPatcher), () =>
+                {
+                    __instance.Title.SetString(
+                        infos.currentRally.name + " | " + infos.currentSeason.year + " | " + infos.currentRally.country
+                    );
+                });
+
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(PreStageScreen), "BuildHeading")]
+    static class PreStagePatcher
+    {
+        static void Postfix(PreStageScreen __instance)
+        {
+            if (Main.enabled && CustomEventManager.IsRecording)
+            {
+                string area = AreaManager.GetAreaStringLocalized(
+                    GameModeManager.GetRallyDataCurrentGameMode().CurrentArea
+                ).ToLower();
+
+                __instance.panelTitleControl.heading_small.fontSize -= 5;
+                __instance.panelTitleControl.SetHeading(
+                    __instance.panelTitleControl.heading_small.text.Replace(area, CustomEventManager.serverInfos.currentRally.name)
+                );
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(RallyCompleteScreen), "ShowYearForCustomEvent")]
+    static class RallyResultPatcher
+    {
+        public static Text title;
+
+        static void Prefix(RallyCompleteScreen __instance)
+        {
+            if (Main.enabled && CustomEventManager.IsRecording)
+                title = __instance.LocationText;
         }
     }
 }

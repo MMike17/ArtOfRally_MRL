@@ -24,6 +24,7 @@ namespace MRL
         public static event Action<bool> OnToggle;
 
         private static GameObject MRL_UI_Prefab;
+        private static event Action OnUpdate = () => { };
 
         // Called by the mod manager
         static bool Load(ModEntry modEntry)
@@ -43,6 +44,7 @@ namespace MRL
                 settings.OnGUI();
             };
             modEntry.OnSaveGUI = settings.Save;
+            modEntry.OnUpdate = (entry, delta) => OnUpdate();
 
             Try("Load Bundle", () =>
             {
@@ -154,6 +156,20 @@ namespace MRL
         public static MRL_Panel SpawnMRL_Panel(Transform parent)
         {
             return GameObject.Instantiate(MRL_UI_Prefab, parent).AddComponent<MRL_Panel>();
+        }
+
+        public static void DelayCall(Action callback)
+        {
+            OnUpdate += () =>
+            {
+                Try("DelayedCall", () =>
+                {
+                    if (callback != null)
+                        callback?.Invoke();
+                });
+
+                callback = null;
+            };
         }
     }
 }
