@@ -218,7 +218,7 @@ namespace MRL
         [HarmonyPostfix]
         static void CheckPanel(Panel panel)
         {
-            if (!Main.enabled && !CustomEventManager.IsRecording)
+            if (!Main.enabled || !CustomEventManager.IsRecording || GameModeManager.GameMode != GameModeManager.GAME_MODES.CUSTOM)
                 return;
 
             Main.Try(nameof(CheckPanel), () =>
@@ -247,7 +247,7 @@ namespace MRL
         [HarmonyPrefix]
         static bool FixTitle(GroupTitle __instance)
         {
-            if (Main.enabled && CustomEventManager.IsRecording)
+            if (Main.enabled && CustomEventManager.IsRecording && GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
             {
                 Main.Try(nameof(FixTitle), () =>
                 {
@@ -272,7 +272,7 @@ namespace MRL
 
         static void Prefix(StageIntroCinematic __instance)
         {
-            if (Main.enabled && CustomEventManager.IsRecording)
+            if (Main.enabled && CustomEventManager.IsRecording && GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
                 instance = __instance;
         }
     }
@@ -284,7 +284,8 @@ namespace MRL
         [HarmonyPostfix]
         static void FixRallyIntro()
         {
-            if (Main.enabled && RallyIntroPatcher.instance != null && CustomEventManager.IsRecording)
+            if (Main.enabled && RallyIntroPatcher.instance != null && CustomEventManager.IsRecording &&
+                GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
             {
                 Main.Try(nameof(FixRallyIntro), () =>
                 {
@@ -306,7 +307,8 @@ namespace MRL
         [HarmonyPrefix]
         static void FixLeaderboardTitle()
         {
-            if (Main.enabled && CustomEventManager.IsRecording && RallyResultPatcher.title != null)
+            if (Main.enabled && CustomEventManager.IsRecording && RallyResultPatcher.title != null &&
+                GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
             {
                 Main.Try(nameof(FixLeaderboardTitle), () =>
                 {
@@ -321,7 +323,7 @@ namespace MRL
     {
         static bool Prefix(LoadingScreen __instance)
         {
-            if (Main.enabled && CustomEventManager.IsRecording)
+            if (Main.enabled && CustomEventManager.IsRecording && GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
             {
                 ServerInfo infos = CustomEventManager.serverInfos;
 
@@ -344,7 +346,7 @@ namespace MRL
     {
         static void Postfix(PreStageScreen __instance)
         {
-            if (Main.enabled && CustomEventManager.IsRecording)
+            if (Main.enabled && CustomEventManager.IsRecording && GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
             {
                 string area = AreaManager.GetAreaStringLocalized(
                     GameModeManager.GetRallyDataCurrentGameMode().CurrentArea
@@ -365,7 +367,7 @@ namespace MRL
 
         static void Prefix(RallyCompleteScreen __instance)
         {
-            if (Main.enabled && CustomEventManager.IsRecording)
+            if (Main.enabled && CustomEventManager.IsRecording && GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
                 title = __instance.LocationText;
         }
     }
